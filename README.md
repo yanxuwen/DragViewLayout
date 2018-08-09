@@ -1,3 +1,7 @@
+### 请前往简书  [点击跳转](https://www.jianshu.com/p/bf2e6e5a3ba0)
+### 喜欢就 star下,非常感谢o(∩_∩)o~~~
+
+
 #### 高仿微信可拖拽返回PhotoView,也支持像今日头条里面的小视频进行拖曳。如下图：
 
 ![video2gif_20180809_133624.gif](https://upload-images.jianshu.io/upload_images/6835615-88fd7e2e42969723.gif?imageMogr2/auto-orient/strip)
@@ -29,8 +33,6 @@
 
 ![微信图片_20180809125440.png](https://upload-images.jianshu.io/upload_images/6835615-df59db263a936670.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-### 请前往简书  [点击跳转](https://www.jianshu.com/p/bf2e6e5a3ba0)
-### 喜欢就 star下,非常感谢o(∩_∩)o~~~
 
 
 
