@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.yanxuwen.dragview.DragViewActivity;
-import com.yanxuwen.dragview.StatusBarUtils;
 import com.yanxuwen.dragviewlayout.R;
 
 import java.util.ArrayList;
@@ -21,8 +20,6 @@ public class TestActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
-        //非全屏界面，由于跳转到DragViewActivity会隐藏状态栏，然后返回的时候要显示状态栏，就但是整体界面会下滑，所以要调用下面
-        StatusBarUtils.setStatusBar(this,R.color.colorPrimary);
         v1=findViewById(R.id.text);
         v2=findViewById(R.id.text2);
         views.add(v1);
@@ -50,9 +47,10 @@ public class TestActivity extends Activity {
     public void open(int position){
         DragViewActivity.startActivity(this,position,new DragViewActivity.OnDataListener() {
             @Override
-            public ArrayList<View> getListView() {
-                return views;
+            public View getCurView(int position) {
+                return views.get(position);
             }
+
             @Override
             public ArrayList<Object> getListData() {
                 return listdata;

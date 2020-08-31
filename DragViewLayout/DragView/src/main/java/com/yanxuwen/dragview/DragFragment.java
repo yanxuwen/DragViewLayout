@@ -48,13 +48,7 @@ public abstract class DragFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view= inflater.inflate(layoutResID, container, false);
-        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                initView();
-            }
-        });
+        initView();
         return view;
     }
 }

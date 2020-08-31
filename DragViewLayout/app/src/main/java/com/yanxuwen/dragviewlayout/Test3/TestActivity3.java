@@ -13,7 +13,6 @@ import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.yanxuwen.dragview.DragViewActivity;
-import com.yanxuwen.dragview.StatusBarUtils;
 import com.yanxuwen.dragviewlayout.R;
 import com.yanxuwen.dragviewlayout.Test1.MyFragment;
 
@@ -31,8 +30,6 @@ public class TestActivity3 extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test3);
         context=this;
-        //非全屏界面，由于跳转到DragViewActivity会隐藏状态栏，然后返回的时候要显示状态栏，就但是整体界面会下滑，所以要调用下面
-        StatusBarUtils.setStatusBar(this,R.color.colorPrimary);
         v1= (ImageView) findViewById(R.id.image);
         views.add(v1);
         listfragemnt.add(MyFragment.class);
@@ -52,10 +49,12 @@ public class TestActivity3 extends Activity {
     public void open(){
         DragViewActivity.startActivity(this,0,new DragViewActivity.OnDataListener() {
             TextView text_abstract = null;
+
             @Override
-            public ArrayList<View> getListView() {
-                return views;
+            public View getCurView(int position) {
+                return views.get(position);
             }
+
             @Override
             public ArrayList<Object> getListData() {
                 return listdata;
