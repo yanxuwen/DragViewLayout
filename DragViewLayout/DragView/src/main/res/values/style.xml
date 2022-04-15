@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="DragViewTheme" >
+    <style name="FrameTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:fitsSystemWindows">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <style name="DragViewTheme">
         <item name="android:fitsSystemWindows">false</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowNoTitle">true</item>
@@ -9,4 +14,16 @@
         <item name="android:windowIsTranslucent">true</item>
     </style>
 
+    <style name="DragViewDialogTheme" parent="Theme.AppCompat.Dialog">
+        <!-- 上面说过，只要是Dialog，这两个属性必须设置 -->
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!--设置透明状态栏，适用于SDK19（4.4）及以上版本-->
+        <item name="android:windowTranslucentStatus">true</item>
+        <!-- 如果你不需要自定义状态栏颜色，下面两个可不要 -->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!-- 透明导航栏 -->
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
 </resources>

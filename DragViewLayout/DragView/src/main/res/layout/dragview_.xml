@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.yanxuwen.dragview.DragViewLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/dragLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:visibility="invisible"
-    >
-    <ImageView
-        android:id="@+id/bgimg"
+    android:layout_height="match_parent">
+
+    <com.yanxuwen.dragview.DragViewLayout
+        android:id="@+id/dragLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        />
-    <com.yanxuwen.dragview.DragViewPage
-        android:id="@+id/viewPager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-    </com.yanxuwen.dragview.DragViewPage>
-</com.yanxuwen.dragview.DragViewLayout>
+        android:visibility="invisible">
+
+        <com.yanxuwen.dragview.DragViewPage
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </com.yanxuwen.dragview.DragViewLayout>
+</FrameLayout>

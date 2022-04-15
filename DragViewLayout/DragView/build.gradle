@@ -10,8 +10,8 @@ android {
     resourcePrefix "dragview_"
 
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 29
+        minSdkVersion 21
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
     }
@@ -25,7 +25,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:28.0.+'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
 }
 def siteUrl = 'https://github.com/yanxuwen/DragView'      // 项目的主页
 def gitUrl = 'https://github.com/yanxuwen/DragView.git'      // Git仓库的url

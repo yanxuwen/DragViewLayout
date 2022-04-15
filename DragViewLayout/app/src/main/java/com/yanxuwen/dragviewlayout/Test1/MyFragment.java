@@ -1,51 +1,36 @@
 package com.yanxuwen.dragviewlayout.Test1;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.Priority;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.bumptech.glide.request.RequestOptions;
-import com.yanxuwen.dragview.DragFragment;
-import com.yanxuwen.dragview.PinchImageView;
+import androidx.fragment.app.Fragment;
+
 import com.yanxuwen.dragviewlayout.R;
 
 /**
  * Created by yanxuwen on 2018/6/15.
  */
 
-public class MyFragment extends DragFragment{
-    PinchImageView dragview;
+public class MyFragment extends Fragment {
+    View parent;
+    TextView text;
+    private int position;
+    private Object data;
     @Override
-    public View getDragView() {
-        return (view==null)?null:view.findViewById(R.id.dragview);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        parent = inflater.inflate(R.layout.fragment, null);
+        init();
+        return parent;
     }
 
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        setContentView(R.layout.fragment);
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public void initView() {
-        dragview= (PinchImageView) view.findViewById(R.id.dragview);
-        RequestOptions options3 = new RequestOptions()
-                .centerCrop()
-                .priority(Priority.HIGH);
-        Glide.with(getContext()).load("http://p3.pstatp.com/large/pgc-image/1530136376452729ffef687").transition(DrawableTransitionOptions.withCrossFade()).apply(options3).into(dragview);
-    }
-
-    @Override
-    public void init() {
-
-    }
-
-    @Override
-    public void onDragStatus(int status) {
-
+    private void init(){
+        text = parent.findViewById(R.id.text);
+        position = getArguments().getInt("position");
+        data = getArguments().getSerializable("data");
+        text.setText(position + "???" + data);
     }
 }

@@ -3,17 +3,20 @@ package com.yanxuwen.dragview;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.FloatRange;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.RelativeLayout;
+
+import androidx.annotation.FloatRange;
+import androidx.core.view.ViewCompat;
 
 /**
  * Created by Flavien Laurent (flavienlaurent.com) on 23/08/13.
@@ -141,7 +144,6 @@ public class DragViewLayout extends RelativeLayout {
     }
 
     boolean smoothSlideTo(float slideOffset) {
-
         final int topBound = getDragView().getPaddingTop();
         int y = 0;
         int x = 0;
@@ -183,7 +185,7 @@ public class DragViewLayout extends RelativeLayout {
         if (getDragView().getHeight() != 0) {
             closeScaleY = (float) closeHeight / getDragView().getHeight();
         }
-        if (getDragView().getWidth() != 0){
+        if (getDragView().getWidth() != 0) {
             closeScaleX = (float) closeWidth / getDragView().getWidth();
         }
         ObjectAnimator translationX = ObjectAnimator.ofFloat(getDragView(), "translationX", 0, closeLeft - getDragView().getLeft());
@@ -199,13 +201,20 @@ public class DragViewLayout extends RelativeLayout {
         if (isCurView) {
             set.play(translationX).with(translationY).with(scaleX).with(scaleY).with(alpha);
         } else {
-            ObjectAnimator alpha2 = ObjectAnimator.ofFloat(this, "alpha", 1f, 0f);
-            set.play(alpha2);
+            set.play(alpha);
         }
+        //由于集合无法监听变化过程，所以使用alpha 来监听
+        alpha.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                if (mOnDrawerOffsetListener != null) {
+                    mOnDrawerOffsetListener.onDrawerOffset((float) valueAnimator.getAnimatedValue());
+                }
+            }
+        });
         //设置时间等
         set.setDuration(300);
         set.setInterpolator(new AccelerateDecelerateInterpolator());
-        set.start();
         set.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -213,6 +222,9 @@ public class DragViewLayout extends RelativeLayout {
 
             @Override
             public void onAnimationEnd(Animator animation) {
+                if (mOnDrawerStatusListener != null) {
+                    mOnDrawerStatusListener.onStatus(CLOSE);
+                }
                 isScrolling = false;
                 closing = false;
                 if (mOnDrawerStatusListener != null)
@@ -228,6 +240,7 @@ public class DragViewLayout extends RelativeLayout {
             public void onAnimationRepeat(Animator animation) {
             }
         });
+        set.start();
     }
 
     private void init() {
@@ -272,9 +285,17 @@ public class DragViewLayout extends RelativeLayout {
         if (isCurView) {
             set.play(translationX).with(translationY).with(scaleX).with(scaleY).with(alpha);
         } else {
-            ObjectAnimator alpha2 = ObjectAnimator.ofFloat(this, "alpha", 0f, 1f);
-            set.play(alpha2);
+            set.play(alpha);
         }
+        //由于集合无法监听变化过程，所以使用alpha 来监听
+        alpha.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                if (mOnDrawerOffsetListener != null) {
+                    mOnDrawerOffsetListener.onDrawerOffset((float) valueAnimator.getAnimatedValue());
+                }
+            }
+        });
         //设置时间等
         set.setDuration(300);
         set.setInterpolator(new AccelerateDecelerateInterpolator());
@@ -286,6 +307,9 @@ public class DragViewLayout extends RelativeLayout {
 
             @Override
             public void onAnimationEnd(Animator animation) {
+                if (mOnDrawerStatusListener != null) {
+                    mOnDrawerStatusListener.onStatus(OPEN);
+                }
                 staring = false;
                 set.removeAllListeners();
             }

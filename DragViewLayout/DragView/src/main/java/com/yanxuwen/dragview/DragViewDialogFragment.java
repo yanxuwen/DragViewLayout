@@ -1,30 +1,34 @@
 package com.yanxuwen.dragview;
 
-import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.FloatRange;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.ViewPager;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 
+import androidx.annotation.FloatRange;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager.widget.ViewPager;
+
+import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by yanxuwen on 2018/6/8.
- */
-
-public class DragViewActivity extends FragmentActivity implements DragViewLayout.OnDrawerStatusListener, DragViewLayout.OnCurViewListener, ViewPager.OnPageChangeListener {
-    private Context currentKey;
+public class DragViewDialogFragment extends DialogFragment implements DragViewLayout.OnDrawerStatusListener, DragViewLayout.OnCurViewListener, ViewPager.OnPageChangeListener {
 
     public interface OnDataListener {
 
@@ -38,7 +42,7 @@ public class DragViewActivity extends FragmentActivity implements DragViewLayout
         /**
          * Frament列表，注意是Frament.class列表
          */
-        public ArrayList<Class> getListFragmentClass();
+        public ArrayList<Class<? extends Fragment>> getListFragmentClass();
 
         public void onPageSelected(int position);
 
@@ -52,10 +56,18 @@ public class DragViewActivity extends FragmentActivity implements DragViewLayout
          */
         public void init();
 
+
     }
 
-    static Map<Context, OnDataListener> map_OnDataListener;
-    OnDataListener mOnDataListener = null;
+    DragViewDialogFragment.OnDataListener mOnDataListener = null;
+
+    public void setOnDataListener(DragViewDialogFragment.OnDataListener l) {
+        mOnDataListener = l;
+    }
+
+    public void removeOnDataListener() {
+        mOnDataListener = null;
+    }
 
     /**
      * 拖动偏移量
@@ -64,12 +76,14 @@ public class DragViewActivity extends FragmentActivity implements DragViewLayout
         /**
          * 拖动偏移量变化为1-0  1为显示状态，0为关闭
          */
-        public void onDrawerOffset(@FloatRange(from = 0, to = 1) float offset);
+        void onDrawerOffset(@FloatRange(from = 0, to = 1) float offset);
+
+        void onDragStatus(int status);
     }
 
-    OnDrawerOffsetListener mOnDrawerOffsetListener = null;
+    DragViewDialogFragment.OnDrawerOffsetListener mOnDrawerOffsetListener = null;
 
-    public void setOnDrawerOffsetListener(OnDrawerOffsetListener l) {
+    public void setOnDrawerOffsetListener(DragViewDialogFragment.OnDrawerOffsetListener l) {
         mOnDrawerOffsetListener = l;
     }
 
@@ -78,30 +92,27 @@ public class DragViewActivity extends FragmentActivity implements DragViewLayout
     }
 
     private DragViewLayout dragViewLayout;
-    public ImageView bgimg;
 
     public DragViewPage viewPager;
     public DragStatePagerAdapter mMPagerAdapter;
     public int currentPosition;
-    private static Map<Context, DragViewActivity> map_instance;
+    private static Map<Context, DragViewDialogFragment> map_instance;
     private Handler mHandler;
+    private ViewGroup parent;
 
-    public static DragViewActivity getInstance(Context context) {
-        if (map_instance != null && map_instance.containsKey(context)) {
-            return map_instance.get(context);
-        }
-        return null;
+    public static DragViewDialogFragment show(FragmentActivity fragmentActivity, int position, DragViewDialogFragment.OnDataListener listener) {
+        DragViewDialogFragment dialogFragment = DragViewDialogFragment.newInstance();
+        dialogFragment.setOnDataListener(listener);
+        dialogFragment.showAllowingStateLoss(fragmentActivity.getSupportFragmentManager(), "tag");
+        return dialogFragment;
     }
 
-    public static void startActivity(Activity context, int position, OnDataListener l) {
-        if (map_instance == null) map_instance = new HashMap<>();
-        map_instance.put(context, null);
-        if (map_OnDataListener == null) map_OnDataListener = new HashMap<>();
-        map_OnDataListener.put(context, l);
-        Intent intent = new Intent(context, DragViewActivity.class);
-        DragViewActivity.getExtra(intent, position);
-        context.startActivity(intent);
-        context.overridePendingTransition(0, 0);
+    public static DragViewDialogFragment newInstance() {
+        DragViewDialogFragment fragment = new DragViewDialogFragment();
+        Bundle bundle = new Bundle();
+
+        fragment.setArguments(bundle);
+        return fragment;
     }
 
     public void notifyDataSetChanged() {
@@ -109,13 +120,30 @@ public class DragViewActivity extends FragmentActivity implements DragViewLayout
     }
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DragStatusBarUtils.setTranslucentForImageViewInFragment(this, 0, null);//状态栏透明
         mHandler = new Handler();
-        setContentView(R.layout.dragview_);
-        dragViewLayout = (DragViewLayout) findViewById(R.id.dragLayout);
-        bgimg = (ImageView) findViewById(R.id.bgimg);
+        //主题设置动画无效，暂时不清楚，请用下面
+        setStyle(STYLE_NO_FRAME, R.style.DragViewDialogTheme);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        getDialog().setCanceledOnTouchOutside(false); //点击周边不隐藏对话框
+        parent = (ViewGroup) inflater.inflate(R.layout.dragview_, null);
+        Window window = this.getDialog().getWindow();
+        window.setDimAmount(0f);// 解决了无法去除遮罩问题
+        WindowManager.LayoutParams lp = window.getAttributes();
+        lp.windowAnimations = 0;
+        window.setAttributes(lp);
+        initView();
+        return parent;
+    }
+
+    private void initView() {
+        dragViewLayout = parent.findViewById(R.id.dragLayout);
+        viewPager = parent.findViewById(R.id.viewPager);
 
         dragViewLayout.setOnDrawerStatusListener(this);
         dragViewLayout.setOnCurViewListener(this);
@@ -125,37 +153,11 @@ public class DragViewActivity extends FragmentActivity implements DragViewLayout
                 if (mOnDrawerOffsetListener != null) mOnDrawerOffsetListener.onDrawerOffset(offset);
             }
         });
-
-        Intent intent = getIntent();
-        currentPosition = intent.getIntExtra("currentPosition", 0);
-        viewPager = (DragViewPage) findViewById(R.id.viewPager);
+        currentPosition = getArguments().getInt("currentPosition", 0);
         viewPager.setDragViewLayout(dragViewLayout);
         setDragView(viewPager);
-        setBackgroundColor(android.R.color.black);
-        init();
 
-    }
-
-    public void init() {
-        if (map_instance != null && map_instance.containsValue(null)) {
-            for (Context getKey : map_instance.keySet()) {
-                if (map_instance.get(getKey) == null) {
-                    map_instance.put(getKey, this);
-                    currentKey = getKey;
-                    break;
-                }
-            }
-        }
-        if (map_OnDataListener == null) {
-            finish();
-            return;
-        }
-        mOnDataListener = map_OnDataListener.get(currentKey);
-        if (mOnDataListener == null) {
-            finish();
-            return;
-        }
-        mMPagerAdapter = new DragStatePagerAdapter(getSupportFragmentManager(), mOnDataListener != null ? mOnDataListener.getListFragmentClass() : null, mOnDataListener != null ? mOnDataListener.getListData() : null);
+        mMPagerAdapter = new DragStatePagerAdapter(getChildFragmentManager(), mOnDataListener != null ? mOnDataListener.getListFragmentClass() : null, mOnDataListener != null ? mOnDataListener.getListData() : null);
         viewPager.setAdapter(mMPagerAdapter);
         viewPager.setCurrentItem(currentPosition);
         viewPager.addOnPageChangeListener(this);
@@ -168,15 +170,22 @@ public class DragViewActivity extends FragmentActivity implements DragViewLayout
         });
         if (mOnDataListener != null) mOnDataListener.init();
 
-    }
-
-    @Override
-    public void setContentView(@LayoutRes int layoutResID) {
-        if (layoutResID == R.layout.dragview_) {
-            super.setContentView(layoutResID);
-        } else {
-            LayoutInflater.from(this).inflate(layoutResID, dragViewLayout, true);
-        }
+        getDialog().setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    if (!dragViewLayout.isOpen()) {
+                        return true;
+                    }
+                    if (mOnDataListener != null && !mOnDataListener.onBackPressed()) {
+                        return true;
+                    }
+                    dragViewLayout.close();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     public void setDragView(View dragview) {
@@ -226,26 +235,12 @@ public class DragViewActivity extends FragmentActivity implements DragViewLayout
         if (status == DragViewLayout.CLOSE) {
             onFinish();
         }
-        DragFragment mFragment = (DragFragment) mMPagerAdapter.getItem(currentPosition);
-        mFragment.onDragStatus(status);
+        if (mOnDrawerOffsetListener != null) mOnDrawerOffsetListener.onDragStatus(status);
 
-    }
-
-    public void setBackgroundColor(int color) {
-        bgimg.setBackgroundColor(getResources().getColor(color));
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (mOnDataListener != null && !mOnDataListener.onBackPressed()) {
-            return;
-        }
-        dragViewLayout.close();
     }
 
     public void onFinish() {
-        finish();
-        overridePendingTransition(0, 0);
+        dismiss();
     }
 
     @Override
@@ -266,11 +261,6 @@ public class DragViewActivity extends FragmentActivity implements DragViewLayout
                 }
             }
         }
-        if (map_OnDataListener != null && map_OnDataListener.containsKey(currentKey)) {
-            map_OnDataListener.remove(currentKey);
-            if (map_OnDataListener.size() == 0) map_OnDataListener = null;
-
-        }
     }
 
     @Override
@@ -278,13 +268,7 @@ public class DragViewActivity extends FragmentActivity implements DragViewLayout
         if (positionOffset == 0) {
             dragViewLayout.setStop(false);
             currentPosition = position;
-            DragFragment mFragment = (DragFragment) mMPagerAdapter.getItem(position);
-            dragViewLayout.setScaleView(mFragment.getDragView());
-            mFragment.init();
             dragViewLayout.setStartView(getCurView());
-            if (mFragment.getDragView() instanceof PinchImageView) {
-                ((PinchImageView) mFragment.getDragView()).setDragViewLayout(dragViewLayout);
-            }
         } else {
             dragViewLayout.setStop(true);
         }
@@ -309,5 +293,37 @@ public class DragViewActivity extends FragmentActivity implements DragViewLayout
 
     public DragViewLayout getDragViewLayout() {
         return dragViewLayout;
+    }
+
+    public ViewGroup getParent() {
+        return parent;
+    }
+
+    /**
+     * 用于替代show ，因为show会抛异常Can not perform this action after onSaveInstanceState
+     * 主要是改 ft.commit(); 改成  ft.commitAllowingStateLoss
+     */
+    public void showAllowingStateLoss(@NonNull FragmentManager manager, @Nullable String tag) {
+        try {
+            Field dismissed = DialogFragment.class.getDeclaredField("mDismissed");
+            dismissed.setAccessible(true);
+            dismissed.set(this, false);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        try {
+            Field shown = DialogFragment.class.getDeclaredField("mShownByMe");
+            shown.setAccessible(true);
+            shown.set(this, true);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        FragmentTransaction ft = manager.beginTransaction();
+        ft.add(this, tag);
+        ft.commitAllowingStateLoss();
     }
 }

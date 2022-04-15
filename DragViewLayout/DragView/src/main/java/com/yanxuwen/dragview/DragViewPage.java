@@ -1,11 +1,12 @@
 package com.yanxuwen.dragview;
 
 import android.content.Context;
-import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-public class DragViewPage extends ViewPager{
+import androidx.viewpager.widget.ViewPager;
+
+public class DragViewPage extends ViewPager {
     public DragViewLayout mDragViewLayout;
 
     public DragViewPage(Context context, AttributeSet attrs) {

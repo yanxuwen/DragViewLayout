@@ -3,13 +3,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#ffffff"
     >
-    <com.yanxuwen.dragview.PinchImageView
+    <ImageView
         android:id="@+id/dragview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
-        tools:src="@mipmap/ic_launcher"
+        android:src="@mipmap/ic_launcher"
         >
-    </com.yanxuwen.dragview.PinchImageView>
+    </ImageView>
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:textSize="16sp"
+        >
+    </TextView>
 </RelativeLayout>
