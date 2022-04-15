@@ -13,10 +13,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.FloatRange;
 import androidx.core.view.ViewCompat;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
+
+import com.github.chrisbanes.photoview.PhotoView;
 
 /**
  * Created by Flavien Laurent (flavienlaurent.com) on 23/08/13.
@@ -118,6 +123,10 @@ public class DragViewLayout extends RelativeLayout {
 
     private float closeDistance = 0;
     private float startDistance = 0;
+    private boolean isVertical = false;
+    private float touchX, touchY;
+    private ViewPager viewPager;
+    private DragStatePagerAdapter viewPagerAdapter;
 
     public DragViewLayout(Context context) {
         super(context);
@@ -132,6 +141,12 @@ public class DragViewLayout extends RelativeLayout {
     public DragViewLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
+    }
+
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        viewPager = (ViewPager) getChildAt(0);
     }
 
     public void maximize() {
@@ -651,9 +666,34 @@ public class DragViewLayout extends RelativeLayout {
         }
     }
 
-    public boolean dispatchTouchEvent(MotionEvent event) {
-
-        return super.dispatchTouchEvent(event);
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (ev.getPointerCount() > 1) return super.dispatchTouchEvent(ev);
+        try {
+            switch (ev.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    touchX = ev.getX();
+                    touchY = ev.getY();
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    float dx = ev.getX() - touchX;
+                    float dy = ev.getY() - touchY;
+                    isVertical = (Math.abs(dy) > Math.abs(dx));
+                    touchX = ev.getX();
+                    touchY = ev.getY();
+                    if (viewPager != null) {
+                        viewPager.dispatchTouchEvent(ev);
+                    }
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    touchX = 0;
+                    touchY = 0;
+                    isVertical = false;
+                    break;
+            }
+        } catch (Exception e) {
+        }
+        return super.dispatchTouchEvent(ev);
     }
 
     float downX = 0;
@@ -669,12 +709,25 @@ public class DragViewLayout extends RelativeLayout {
                 }
             }
         }
-        /**
-         * 检查是否可以拦截touch事件
-         * 如果onInterceptTouchEvent可以return true 则这里return true
-         */
+
+        if (isVertical && isAllowDrag()) {
+            drag = true;
+        }
         return drag ? true : false;
 
+    }
+
+    private boolean isAllowDrag() {
+        if (viewPager != null) {
+            if (viewPagerAdapter == null && viewPager.getAdapter() instanceof DragStatePagerAdapter) {
+                viewPagerAdapter = (DragStatePagerAdapter) viewPager.getAdapter();
+            }
+            Fragment fragment = viewPagerAdapter.getItem(viewPager.getCurrentItem());
+            if (fragment instanceof AllowDragListener) {
+                return ((AllowDragListener) fragment).isAllowDrag();
+            }
+        }
+        return false;
     }
 
     @Override
@@ -773,5 +826,4 @@ public class DragViewLayout extends RelativeLayout {
             }
         };
     }
-
 }

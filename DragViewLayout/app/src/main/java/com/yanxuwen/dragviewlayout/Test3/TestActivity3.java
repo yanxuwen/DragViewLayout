@@ -50,7 +50,7 @@ public class TestActivity3 extends FragmentActivity {
         RequestOptions options3 = new RequestOptions()
                 .centerCrop()
                 .priority(Priority.HIGH);
-        Glide.with(context).load("http://aiyuxm.com/619744a7a1710f3117f4187f_1641631229437_2").transition(DrawableTransitionOptions.withCrossFade()).apply(options3).into(v1);
+        Glide.with(context).load("http://aiyuxm.com/619744a7a1710f3117f4187f_1641631229437_2").into(v1);
 
     }
 
@@ -106,8 +106,9 @@ public class TestActivity3 extends FragmentActivity {
                 dialogFragment.setOnDrawerOffsetListener(new DragViewDialogFragment.OnDrawerOffsetListener() {
                     @Override
                     public void onDrawerOffset(@FloatRange(from = 0, to = 1) float offset) {
-                        view_test3.setAlpha(offset - 0.3f);
-                        Log.e("yxw", "" + offset);
+                        if (view_test3 != null) {
+                            view_test3.setAlpha(offset - 0.3f);
+                        }
                     }
 
                     @Override
