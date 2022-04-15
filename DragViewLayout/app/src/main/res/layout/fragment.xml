@@ -11,8 +11,11 @@
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:src="@mipmap/ic_launcher"
-        >
-    </com.github.chrisbanes.photoview.PhotoView>
+        />
+    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
     <TextView
         android:id="@+id/text"
         android:layout_width="match_parent"
