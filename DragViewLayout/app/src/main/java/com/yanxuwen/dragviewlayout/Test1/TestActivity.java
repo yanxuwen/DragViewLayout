@@ -68,16 +68,16 @@ public class TestActivity extends FragmentActivity {
 
             @Override
             public void onPageSelected(int position) {
-                if (position == 1 && listdata.size() < 4) {
-                    //更加数据
-                    listdata.add("sdsds3");
-                    listdata.add("sdsds4");
-                    views.add(v1);
-                    views.add(v2);
-                    listfragemnt.add(MyFragment.class);
-                    listfragemnt.add(MyFragment.class);
-                    notifyDataSetChanged();
-                }
+//                if (position == 1 && listdata.size() < 4) {
+//                    //更加数据
+//                    listdata.add("sdsds3");
+//                    listdata.add("sdsds4");
+//                    views.add(v1);
+//                    views.add(v2);
+//                    listfragemnt.add(MyFragment.class);
+//                    listfragemnt.add(MyFragment.class);
+//                    notifyDataSetChanged();
+//                }
             }
 
             @Override

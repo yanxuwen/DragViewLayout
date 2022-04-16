@@ -748,7 +748,7 @@ public class DragViewLayout extends RelativeLayout {
                 return ((AllowDragListener) fragment).isAllowDrag();
             }
         }
-        return false;
+        return true;
     }
 
     @Override

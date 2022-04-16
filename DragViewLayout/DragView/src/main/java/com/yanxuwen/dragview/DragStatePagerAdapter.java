@@ -59,6 +59,9 @@ public class DragStatePagerAdapter extends FragmentStatePagerAdapter {
                 }
                 return fragmentList.get(position);
             } else {
+                for (int i = fragmentList.size(); i < position; i++) {
+                    fragmentList.add(null);
+                }
                 Fragment fragment = (Fragment) (fragmentClassList.get(position)).newInstance();
                 Bundle b = new Bundle();
                 b.putInt("position", position);

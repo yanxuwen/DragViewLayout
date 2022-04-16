@@ -164,7 +164,6 @@ public class DragViewDialogFragment extends DialogFragment implements DragViewLa
             setDragView(viewPager2);
             mMPagerAdapter2 = new DragStatePagerAdapter2(getChildFragmentManager(), mOnDataListener != null ? mOnDataListener.getListFragmentClass() : null, mOnDataListener != null ? mOnDataListener.getListData() : null);
             viewPager2.setAdapter(mMPagerAdapter2);
-            viewPager2.setCurrentItem(currentPosition);
             viewPager2.registerOnPageChangeCallback(pageChangeCallback2 = new ViewPager2.OnPageChangeCallback() {
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -184,24 +183,16 @@ public class DragViewDialogFragment extends DialogFragment implements DragViewLa
                     DragViewDialogFragment.this.onPageScrollStateChanged(state);
                 }
             });
-            viewPager2.post(new Runnable() {
-                @Override
-                public void run() {
-                    onPageSelected(currentPosition);
-                }
-            });
+            viewPager2.setCurrentItem(currentPosition);
         } else {
             setDragView(viewPager);
             mMPagerAdapter = new DragStatePagerAdapter(getChildFragmentManager(), mOnDataListener != null ? mOnDataListener.getListFragmentClass() : null, mOnDataListener != null ? mOnDataListener.getListData() : null);
             viewPager.setAdapter(mMPagerAdapter);
-            viewPager.setCurrentItem(currentPosition);
             viewPager.addOnPageChangeListener(this);
-            viewPager.post(new Runnable() {
-                @Override
-                public void run() {
-                    onPageSelected(currentPosition);
-                }
-            });
+            viewPager.setCurrentItem(currentPosition);
+            if (currentPosition == 0) {
+                onPageSelected(currentPosition);
+            }
         }
 
         if (mOnDataListener != null) mOnDataListener.init();
@@ -295,7 +286,6 @@ public class DragViewDialogFragment extends DialogFragment implements DragViewLa
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
         if (positionOffset == 0) {
             dragViewLayout.setStop(false);
-            currentPosition = position;
             dragViewLayout.setStartView(getCurView());
         } else {
             dragViewLayout.setStop(true);
@@ -304,7 +294,10 @@ public class DragViewDialogFragment extends DialogFragment implements DragViewLa
 
     @Override
     public void onPageSelected(final int position) {
-        if (mOnDataListener != null) mOnDataListener.onPageSelected(position);
+        currentPosition = position;
+        if (mOnDataListener != null) {
+            mOnDataListener.onPageSelected(position);
+        }
     }
 
     @Override
