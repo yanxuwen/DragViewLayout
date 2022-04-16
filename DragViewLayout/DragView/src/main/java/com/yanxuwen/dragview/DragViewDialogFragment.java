@@ -99,13 +99,14 @@ public class DragViewDialogFragment extends DialogFragment implements DragViewLa
     public ViewPager2 viewPager2;
     public DragStatePagerAdapter2 mMPagerAdapter2;
     public ViewPager2.OnPageChangeCallback pageChangeCallback2;
-    public int currentPosition;
+    private int currentPosition;
     private ViewGroup parent;
     private boolean isViewPage2 = true;//是否使用ViewPage2
 
     public static DragViewDialogFragment show(FragmentActivity fragmentActivity, int position, DragViewDialogFragment.OnDataListener listener) {
         DragViewDialogFragment dialogFragment = DragViewDialogFragment.newInstance();
         dialogFragment.setOnDataListener(listener);
+        dialogFragment.setCurrentPosition(position);
         dialogFragment.showAllowingStateLoss(fragmentActivity.getSupportFragmentManager(), "tag");
         return dialogFragment;
     }
@@ -159,7 +160,6 @@ public class DragViewDialogFragment extends DialogFragment implements DragViewLa
                 if (mOnDrawerOffsetListener != null) mOnDrawerOffsetListener.onDrawerOffset(offset);
             }
         });
-        currentPosition = getArguments().getInt("currentPosition", 0);
         if (isViewPage2) {
             setDragView(viewPager2);
             mMPagerAdapter2 = new DragStatePagerAdapter2(getChildFragmentManager(), mOnDataListener != null ? mOnDataListener.getListFragmentClass() : null, mOnDataListener != null ? mOnDataListener.getListData() : null);
@@ -353,5 +353,16 @@ public class DragViewDialogFragment extends DialogFragment implements DragViewLa
         FragmentTransaction ft = manager.beginTransaction();
         ft.add(this, tag);
         ft.commitAllowingStateLoss();
+    }
+
+    /**
+     * 是否支持ViewPage2
+     */
+    public void setViewPage2(boolean isViewPage2) {
+        this.isViewPage2 = isViewPage2;
+    }
+
+    public void setCurrentPosition(int currentPosition) {
+        this.currentPosition = currentPosition;
     }
 }

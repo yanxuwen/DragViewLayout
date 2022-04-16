@@ -50,7 +50,7 @@ public class TestActivity extends FragmentActivity {
     }
 
     public void open(int position) {
-        dialogFragment = DragViewDialogFragment.show(this, position, new DragViewDialogFragment.OnDataListener() {
+        dialogFragment = DragViewDialogFragment.show(this, 1, new DragViewDialogFragment.OnDataListener() {
             @Override
             public View getCurView(int position) {
                 return views.get(position);
