@@ -64,6 +64,16 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
             return this;
         }
 
+        /**
+         * 建议开启
+         * 启动的View是否透明化，
+         * 使得效果更好
+         */
+        public Builder setTransparentView(boolean isTransparentView) {
+            mController.isTransparentView = isTransparentView;
+            return this;
+        }
+
         public Builder setDefaultPosition(int defaultPosition) {
             mController.defaultPosition = defaultPosition;
             return this;
@@ -74,7 +84,7 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
          *
          * @param listData          数据列表 不能为空
          * @param fragmentClassList Fragment.class列表 不能为空
-         * @param listView          View 列表，用于展示启动动画跟关闭动画  允许为空，为空的画，则没有拖拽动画
+         * @param listView          View 列表，用于启动的View  允许为空，为空的画，则没有拖拽动画
          */
         public Builder setData(@NonNull List<? extends Serializable> listData, @NonNull List<Class<? extends Fragment>> fragmentClassList, List<View> listView) {
             mController.listData = listData;
@@ -88,7 +98,7 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
          *
          * @param object        数据 不能为空
          * @param fragmentClass Fragment.class 不能为空
-         * @param view          View 用于展示启动动画跟关闭动画  允许为空，为空的画，则没有拖拽动画
+         * @param view          View 用于启动的View  允许为空，为空的画，则没有拖拽动画
          */
         public Builder setData(@NonNull Serializable object, @NonNull Class<? extends Fragment> fragmentClass, View view) {
             List<Serializable> listData = new ArrayList<>();
@@ -114,7 +124,7 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
         }
 
         public DragViewDialog show() {
-            DragViewDialog dialog =  create();
+            DragViewDialog dialog = create();
             dialog.showAllowingStateLoss(mController.fragmentActivity.getSupportFragmentManager(), "tag");
             return dialog;
         }
@@ -152,7 +162,7 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
         dragViewLayout.setOnDrawerOffsetListener(new DragViewLayout.OnDrawerOffsetListener() {
             @Override
             public void onDrawerOffset(@FloatRange(from = 0, to = 1) float offset) {
-                if (mController != null && mController.listener!= null) {
+                if (mController != null && mController.listener != null) {
                     mController.listener.onDrawerOffset(offset);
                 }
             }
@@ -252,7 +262,20 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
 
     @Override
     public void onStatus(int status) {
-        if (status == DragViewLayout.CLOSE) {
+        if (status == DragViewLayout.OPEN) {
+            if (mController != null && mController.isTransparentView) {
+                //隐藏透明View
+                if (mController.listView != null && mController.listView.size() > currentPosition) {
+                    mController.listView.get(currentPosition).setVisibility(View.INVISIBLE);
+                }
+            }
+        } else if (status == DragViewLayout.CLOSE) {
+            if (mController != null && mController.isTransparentView) {
+                //显示当前View
+                if (mController.listView != null && mController.listView.size() > currentPosition) {
+                    mController.listView.get(currentPosition).setVisibility(View.VISIBLE);
+                }
+            }
             onFinish();
         }
         if (mController != null && mController.listener != null) {

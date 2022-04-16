@@ -128,6 +128,7 @@ public class DragViewLayout extends RelativeLayout {
     private DragStatePagerAdapter viewPagerAdapter;
     private ViewPager2 viewPager2;
     private DragStatePagerAdapter2 viewPagerAdapter2;
+
     public DragViewLayout(Context context) {
         super(context);
         init();
@@ -211,7 +212,7 @@ public class DragViewLayout extends RelativeLayout {
         ObjectAnimator translationX = ObjectAnimator.ofFloat(getDragView(), "translationX", 0, closeLeft - getDragView().getLeft());
         ObjectAnimator translationY = ObjectAnimator.ofFloat(getDragView(), "translationY", 0, closeTop - getDragView().getTop());
         //创建透明度动画
-        ObjectAnimator alpha = ObjectAnimator.ofFloat(getBgView(), "alpha", 1f, 0f);
+        ObjectAnimator alpha = ObjectAnimator.ofFloat(isCurView ? null : getBgView(), "alpha", 1f, 0f);
         ObjectAnimator scaleX = ObjectAnimator.ofFloat(getDragView(), "scaleX", 1, closeScaleX);
         ObjectAnimator scaleY = ObjectAnimator.ofFloat(getDragView(), "scaleY", 1, closeScaleY);
         //设置控件缩放中心为控件左上角0，0
@@ -225,7 +226,7 @@ public class DragViewLayout extends RelativeLayout {
         } else {
             set.play(alpha);
         }
-        //由于集合无法监听变化过程，所以使用alpha 来监听
+        //由于集合无法监听变化过程，所以使用alpha 来监听,因为alpha值刚好符合  1-0，可以做偏移量
         alpha.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
@@ -297,7 +298,7 @@ public class DragViewLayout extends RelativeLayout {
         ObjectAnimator translationX = ObjectAnimator.ofFloat(getDragView(), "translationX", closeLeft - getDragView().getLeft(), 0);
         ObjectAnimator translationY = ObjectAnimator.ofFloat(getDragView(), "translationY", closeTop - getDragView().getTop(), 0);
         //创建透明度动画
-        ObjectAnimator alpha = ObjectAnimator.ofFloat(getBgView(), "alpha", 0f, 1f);
+        ObjectAnimator alpha = ObjectAnimator.ofFloat(isCurView ? null : getBgView(), "alpha", 0f, 1f);
         ObjectAnimator scaleX = ObjectAnimator.ofFloat(getDragView(), "scaleX", closeScaleX, 1);
         ObjectAnimator scaleY = ObjectAnimator.ofFloat(getDragView(), "scaleY", closeScaleY, 1);
 
@@ -309,7 +310,7 @@ public class DragViewLayout extends RelativeLayout {
         } else {
             set.play(alpha);
         }
-        //由于集合无法监听变化过程，所以使用alpha 来监听
+        //由于集合无法监听变化过程，所以使用alpha 来监听,因为alpha值刚好符合  0-1，可以做偏移量
         alpha.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {

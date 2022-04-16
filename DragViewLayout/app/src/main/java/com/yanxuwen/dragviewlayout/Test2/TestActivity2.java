@@ -1,6 +1,7 @@
 package com.yanxuwen.dragviewlayout.Test2;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -9,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import com.yanxuwen.dragview.DragViewDialog;
+import com.yanxuwen.dragview.DragViewLayout;
 import com.yanxuwen.dragview.listener.Listener;
 import com.yanxuwen.dragviewlayout.ColorData;
 import com.yanxuwen.dragviewlayout.R;
@@ -31,7 +33,7 @@ public class TestActivity2 extends FragmentActivity {
         v1 = findViewById(R.id.text);
         views.add(v1);
         listfragemnt.add(MyFragment2.class);
-        listdata.add(new ColorData(R.color.colorAccent,"粉红色"));
+        listdata.add(new ColorData(R.color.colorAccent, "粉红色"));
         v1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -46,8 +48,10 @@ public class TestActivity2 extends FragmentActivity {
         dialog = new DragViewDialog.Builder(this)
                 .setData(listdata, listfragemnt, views)
                 .setViewPage2(true)
+                .setTransparentView(true)
                 .setListener(new Listener() {
                     TextView text_abstract = null;
+
                     @Override
                     public void init() {
                         if (view_test3 == null) {
@@ -63,8 +67,8 @@ public class TestActivity2 extends FragmentActivity {
                         super.onPageSelected(position);
                         if (position == 0 && listdata.size() < 3) {
                             //动态更加数据
-                            listdata.add(new ColorData(R.color.colorPrimary,"蓝色"));
-                            listdata.add(new ColorData(R.color.colorPrimaryDark,"深蓝色"));
+                            listdata.add(new ColorData(R.color.colorPrimary, "蓝色"));
+                            listdata.add(new ColorData(R.color.colorPrimaryDark, "深蓝色"));
                             views.add(v1);
                             views.add(v1);
                             listfragemnt.add(MyFragment2.class);
@@ -80,9 +84,18 @@ public class TestActivity2 extends FragmentActivity {
                     @Override
                     public void onDrawerOffset(@FloatRange(from = 0, to = 1) float offset) {
                         super.onDrawerOffset(offset);
-                        text_abstract.setAlpha(offset - 0.3f);
-                        if (offset == 0) {
+                        Log.e("yxw", "offset:" + offset);
+                        if (text_abstract != null) {
+                            text_abstract.setAlpha(offset - 0.3f);
+                        }
+                    }
+
+                    @Override
+                    public void onDragStatus(int status) {
+                        super.onDragStatus(status);
+                        if (status == DragViewLayout.CLOSE) {
                             view_test3 = null;
+
                         }
                     }
                 })

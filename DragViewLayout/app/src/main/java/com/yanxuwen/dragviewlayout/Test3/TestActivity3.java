@@ -52,32 +52,7 @@ public class TestActivity3 extends FragmentActivity {
         dragViewDialog = new DragViewDialog.Builder(this)
                 .setData(listdata, listfragemnt, views)
                 .setViewPage2(true)
-                .setListener(new Listener() {
-                    TextView text_abstract = null;
-
-                    @Override
-                    public void onPageSelected(int position) {
-                        super.onPageSelected(position);
-                        if (position == 0 && listdata.size() < 3) {
-                            //更加数据
-                            listdata.add("sdsds2");
-                            listdata.add("sdsds3");
-                            views.add(v1);
-                            views.add(v1);
-                            listfragemnt.add(MyFragment.class);
-                            listfragemnt.add(MyFragment.class);
-                            notifyDataSetChanged();
-                        }
-                        if (text_abstract != null) {
-                            text_abstract.setText((position + 1) + "/" + 3 + " 从第一张照片XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-                        }
-
-                    }
-                }).show();
-    }
-
-
-    public void notifyDataSetChanged() {
-        dragViewDialog.notifyDataSetChanged();
+                .setTransparentView(true)
+                .show();
     }
 }
