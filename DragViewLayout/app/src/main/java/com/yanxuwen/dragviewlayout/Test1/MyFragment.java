@@ -72,6 +72,8 @@ public class MyFragment extends Fragment implements AllowDragListener {
                                 longImageView.setDoubleTapZoomDpi(SubsamplingScaleImageView.ZOOM_FOCUS_CENTER);
                                 longImageView.setImage(ImageSource.bitmap(resource),
                                         new ImageViewState(0, new PointF(0, 0), 0));
+                                isLongTop = longImageView.getCenter().y - (longImageView.getHeight() / 2) == 0;
+                                longScale = longImageView.getScale();
                             } else {
                                 // 普通图片
                                 photoView.setImageBitmap(resource);
@@ -88,7 +90,7 @@ public class MyFragment extends Fragment implements AllowDragListener {
             @Override
             public void onCenterChanged(PointF newCenter, int origin) {
                 isLongTop = false;
-                if (newCenter != null && newCenter.y - (longImageView.getHeight() / 2) == 0){
+                if (newCenter != null && newCenter.y - (longImageView.getHeight() / 2) == 0) {
                     isLongTop = true;
                 }
 
@@ -114,15 +116,13 @@ public class MyFragment extends Fragment implements AllowDragListener {
 
     @Override
     public boolean isAllowDrag() {
-        if (eqLongImage && (longScale > 1 || !isLongTop)){
+        if (eqLongImage && (longScale > 1 || !isLongTop)) {
             //长图，判断缩放大于1 或  不在顶部，
             //则不允许拖拽
             return false;
-        } else {
+        } else if (!eqLongImage && photoView.getScale() > 1) {
             //正常图片，判断只要缩放大于1则不允许拖拽
-            if (photoView.getScale() > 1) {
-                return false;
-            }
+            return false;
         }
 
         return true;

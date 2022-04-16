@@ -209,7 +209,9 @@ public class DragViewLayout extends RelativeLayout {
         ObjectAnimator alpha = ObjectAnimator.ofFloat(getBgView(), "alpha", 1f, 0f);
         ObjectAnimator scaleX = ObjectAnimator.ofFloat(getDragView(), "scaleX", 1, closeScaleX);
         ObjectAnimator scaleY = ObjectAnimator.ofFloat(getDragView(), "scaleY", 1, closeScaleY);
-
+        //设置控件缩放中心为控件左上角0，0
+        getDragView().setPivotX(0);
+        getDragView().setPivotY(0);
         //动画集合
         final AnimatorSet set = new AnimatorSet();
         //添加动画
@@ -709,7 +711,11 @@ public class DragViewLayout extends RelativeLayout {
                 }
             }
         }
-
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            //ACTION_DOWN 需要执行下onTouchEvent，因为如果嵌套了PhotoView的画，ACTION_DOWN是不会触发onTouchEvent的，
+            //导致拖拽不灵敏问题
+            onTouchEvent(ev);
+        }
         if (isVertical && isAllowDrag()) {
             drag = true;
         }
