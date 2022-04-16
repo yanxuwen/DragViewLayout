@@ -18,6 +18,7 @@ import androidx.annotation.FloatRange;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.github.chrisbanes.photoview.PhotoView;
 
@@ -125,7 +126,8 @@ public class DragViewLayout extends RelativeLayout {
     private float touchX, touchY;
     private ViewPager viewPager;
     private DragStatePagerAdapter viewPagerAdapter;
-
+    private ViewPager2 viewPager2;
+    private DragStatePagerAdapter2 viewPagerAdapter2;
     public DragViewLayout(Context context) {
         super(context);
         init();
@@ -144,7 +146,12 @@ public class DragViewLayout extends RelativeLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        viewPager = (ViewPager) getChildAt(0);
+        View view = getChildAt(0);
+        if (view instanceof ViewPager) {
+            viewPager = (ViewPager) view;
+        } else if (view instanceof ViewPager2) {
+            viewPager2 = (ViewPager2) view;
+        }
     }
 
     public void maximize() {
@@ -267,7 +274,7 @@ public class DragViewLayout extends RelativeLayout {
         getDragView().setPivotX(0);
         getDragView().setPivotY(0);
         ViewGroup mParent = (ViewGroup) getDragView().getParent();
-        if (mParent instanceof DragViewPage) {
+        if (mParent instanceof ViewPager || mParent instanceof ViewPager2) {
             mParent = this;
         }
         mDragHelper = ViewDragHelper.create(mParent, 1.0f, new ViewDragCallback());
@@ -378,7 +385,7 @@ public class DragViewLayout extends RelativeLayout {
     public View getDragView() {
         if (getScaleView() == null) return dragview;
         ViewGroup mParent = (ViewGroup) getScaleView().getParent();
-        if (mParent instanceof DragViewPage) {
+        if (mParent instanceof ViewPager || mParent instanceof ViewPager2) {
             return dragview;
         } else {
             return getScaleView();
@@ -682,6 +689,9 @@ public class DragViewLayout extends RelativeLayout {
                     if (viewPager != null) {
                         viewPager.dispatchTouchEvent(ev);
                     }
+                    if (viewPager2 != null) {
+                        viewPager2.dispatchTouchEvent(ev);
+                    }
                     break;
                 case MotionEvent.ACTION_UP:
                 case MotionEvent.ACTION_CANCEL:
@@ -726,6 +736,14 @@ public class DragViewLayout extends RelativeLayout {
                 viewPagerAdapter = (DragStatePagerAdapter) viewPager.getAdapter();
             }
             Fragment fragment = viewPagerAdapter.getItem(viewPager.getCurrentItem());
+            if (fragment instanceof AllowDragListener) {
+                return ((AllowDragListener) fragment).isAllowDrag();
+            }
+        } else if (viewPager2 != null) {
+            if (viewPagerAdapter2 == null && viewPager2.getAdapter() instanceof DragStatePagerAdapter2) {
+                viewPagerAdapter2 = (DragStatePagerAdapter2) viewPager2.getAdapter();
+            }
+            Fragment fragment = viewPagerAdapter2.getItem(viewPager2.getCurrentItem());
             if (fragment instanceof AllowDragListener) {
                 return ((AllowDragListener) fragment).isAllowDrag();
             }

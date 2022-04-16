@@ -23,6 +23,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -93,12 +94,14 @@ public class DragViewDialogFragment extends DialogFragment implements DragViewLa
 
     private DragViewLayout dragViewLayout;
 
-    public DragViewPage viewPager;
+    public ViewPager viewPager;
     public DragStatePagerAdapter mMPagerAdapter;
+    public ViewPager2 viewPager2;
+    public DragStatePagerAdapter2 mMPagerAdapter2;
+    public ViewPager2.OnPageChangeCallback pageChangeCallback2;
     public int currentPosition;
-    private static Map<Context, DragViewDialogFragment> map_instance;
-    private Handler mHandler;
     private ViewGroup parent;
+    private boolean isViewPage2 = true;//是否使用ViewPage2
 
     public static DragViewDialogFragment show(FragmentActivity fragmentActivity, int position, DragViewDialogFragment.OnDataListener listener) {
         DragViewDialogFragment dialogFragment = DragViewDialogFragment.newInstance();
@@ -116,13 +119,16 @@ public class DragViewDialogFragment extends DialogFragment implements DragViewLa
     }
 
     public void notifyDataSetChanged() {
-        mMPagerAdapter.notifyDataSetChanged();
+        if (isViewPage2) {
+            mMPagerAdapter2.update();
+        } else {
+            mMPagerAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mHandler = new Handler();
         //主题设置动画无效，暂时不清楚，请用下面
         setStyle(STYLE_NO_FRAME, R.style.DragViewDialogTheme);
     }
@@ -131,7 +137,7 @@ public class DragViewDialogFragment extends DialogFragment implements DragViewLa
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         getDialog().setCanceledOnTouchOutside(false); //点击周边不隐藏对话框
-        parent = (ViewGroup) inflater.inflate(R.layout.dragview_, null);
+        parent = (ViewGroup) inflater.inflate(isViewPage2 ? R.layout.dragview2_ : R.layout.dragview_, null);
         Window window = this.getDialog().getWindow();
         window.setDimAmount(0f);// 解决了无法去除遮罩问题
         WindowManager.LayoutParams lp = window.getAttributes();
@@ -144,7 +150,7 @@ public class DragViewDialogFragment extends DialogFragment implements DragViewLa
     private void initView() {
         dragViewLayout = parent.findViewById(R.id.dragLayout);
         viewPager = parent.findViewById(R.id.viewPager);
-
+        viewPager2 = parent.findViewById(R.id.viewPager2);
         dragViewLayout.setOnDrawerStatusListener(this);
         dragViewLayout.setOnCurViewListener(this);
         dragViewLayout.setOnDrawerOffsetListener(new DragViewLayout.OnDrawerOffsetListener() {
@@ -154,20 +160,50 @@ public class DragViewDialogFragment extends DialogFragment implements DragViewLa
             }
         });
         currentPosition = getArguments().getInt("currentPosition", 0);
-        viewPager.setDragViewLayout(dragViewLayout);
-        setDragView(viewPager);
+        if (isViewPage2) {
+            setDragView(viewPager2);
+            mMPagerAdapter2 = new DragStatePagerAdapter2(getChildFragmentManager(), mOnDataListener != null ? mOnDataListener.getListFragmentClass() : null, mOnDataListener != null ? mOnDataListener.getListData() : null);
+            viewPager2.setAdapter(mMPagerAdapter2);
+            viewPager2.setCurrentItem(currentPosition);
+            viewPager2.registerOnPageChangeCallback(pageChangeCallback2 = new ViewPager2.OnPageChangeCallback() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                    super.onPageScrolled(position, positionOffset, positionOffsetPixels);
+                    DragViewDialogFragment.this.onPageScrolled(position, positionOffset, positionOffsetPixels);
+                }
 
-        mMPagerAdapter = new DragStatePagerAdapter(getChildFragmentManager(), mOnDataListener != null ? mOnDataListener.getListFragmentClass() : null, mOnDataListener != null ? mOnDataListener.getListData() : null);
-        viewPager.setAdapter(mMPagerAdapter);
-        viewPager.setCurrentItem(currentPosition);
-        viewPager.addOnPageChangeListener(this);
-        viewPager.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                viewPager.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                onPageSelected(currentPosition);
-            }
-        });
+                @Override
+                public void onPageSelected(int position) {
+                    super.onPageSelected(position);
+                    DragViewDialogFragment.this.onPageSelected(position);
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+                    super.onPageScrollStateChanged(state);
+                    DragViewDialogFragment.this.onPageScrollStateChanged(state);
+                }
+            });
+            viewPager2.post(new Runnable() {
+                @Override
+                public void run() {
+                    onPageSelected(currentPosition);
+                }
+            });
+        } else {
+            setDragView(viewPager);
+            mMPagerAdapter = new DragStatePagerAdapter(getChildFragmentManager(), mOnDataListener != null ? mOnDataListener.getListFragmentClass() : null, mOnDataListener != null ? mOnDataListener.getListData() : null);
+            viewPager.setAdapter(mMPagerAdapter);
+            viewPager.setCurrentItem(currentPosition);
+            viewPager.addOnPageChangeListener(this);
+            viewPager.post(new Runnable() {
+                @Override
+                public void run() {
+                    onPageSelected(currentPosition);
+                }
+            });
+        }
+
         if (mOnDataListener != null) mOnDataListener.init();
 
         getDialog().setOnKeyListener(new DialogInterface.OnKeyListener() {
@@ -196,10 +232,6 @@ public class DragViewDialogFragment extends DialogFragment implements DragViewLa
     protected static Intent getExtra(Intent intent, int currentPosition) {
         intent.putExtra("currentPosition", currentPosition);
         return intent;
-    }
-
-    public int getCount() {
-        return mMPagerAdapter.getCount();
     }
 
     public ArrayList<DragViewLayout.ImageBean> getImageBeans(View[] views) {
@@ -246,21 +278,17 @@ public class DragViewDialogFragment extends DialogFragment implements DragViewLa
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (viewPager != null) {
+            viewPager.removeOnPageChangeListener(this);
+        }
+        if (viewPager2 != null) {
+            viewPager2.unregisterOnPageChangeCallback(pageChangeCallback2);
+        }
         dragViewLayout.removeOnDrawerStatusListener();
         dragViewLayout.removeOnCurViewListener();
         dragViewLayout.removeOnDrawerOffsetListener();
         removeOnDrawerOffsetListener();
-        mHandler = null;
         mOnDataListener = null;
-        if (map_instance != null && map_instance.containsValue(this)) {
-            for (Context getKey : map_instance.keySet()) {
-                if (map_instance.get(getKey) == this) {
-                    map_instance.remove(getKey);
-                    if (map_instance.size() == 0) map_instance = null;
-                    break;
-                }
-            }
-        }
     }
 
     @Override

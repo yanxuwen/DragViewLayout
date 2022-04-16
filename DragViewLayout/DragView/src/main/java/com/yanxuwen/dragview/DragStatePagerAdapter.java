@@ -22,56 +22,50 @@ import java.util.List;
  * 如果设置了setOffscreenPageLimit就会缓存几页，不会被销毁
  */
 public class DragStatePagerAdapter extends FragmentStatePagerAdapter {
-    public List<Class<? extends Fragment>> list_fragment;
-    public List<Object> list_data;
-    public List<Fragment> listFragment;
+    public List<Object> listData;
+    public List<Class<? extends Fragment>> fragmentClassList;
+    public List<Fragment> fragmentList;
 
-    public DragStatePagerAdapter(FragmentManager fm) {
+    public DragStatePagerAdapter(FragmentManager fm, List<Class<? extends Fragment>> fragmentClassList, List<Object> listData) {
         super(fm);
+        this.fragmentClassList = fragmentClassList;
+        this.listData = listData;
+        fragmentList = new ArrayList<>();
     }
 
-    public DragStatePagerAdapter(FragmentManager fm, List<Class<? extends Fragment>> list_fragment, List<Object> list_data) {
-        super(fm);
-        this.list_fragment = list_fragment;
-        this.list_data = list_data;
-        listFragment = new ArrayList<>();
-    }
-
+    @Override
     public Fragment getItem(int position) {
-        if (listFragment != null && listFragment.size() > position && listFragment.get(position) != null) {
-            return listFragment.get(position);
+        if (fragmentList != null && fragmentList.size() > position && fragmentList.get(position) != null) {
+            return fragmentList.get(position);
         }
         try {
-            if (listFragment.size() == position) {
-                Fragment fragment = (Fragment) (list_fragment.get(position)).newInstance();
+            if (fragmentList.size() == position) {
+                Fragment fragment = (Fragment) (fragmentClassList.get(position)).newInstance();
                 Bundle b = new Bundle();
                 b.putInt("position", position);
-                b.putSerializable("data", (Serializable) list_data.get(position));
+                b.putSerializable("data", (Serializable) listData.get(position));
                 fragment.setArguments(b);
-                listFragment.add(fragment);
-                return listFragment.get(position);
+                fragmentList.add(fragment);
+                return fragmentList.get(position);
 
-            } else if (listFragment.size() > position) {
+            } else if (fragmentList.size() > position) {
 
-                if (listFragment.get(position) == null) {
-                    listFragment.set(position, (Fragment) (list_fragment.get(position)).newInstance());
+                if (fragmentList.get(position) == null) {
+                    fragmentList.set(position, (Fragment) (fragmentClassList.get(position)).newInstance());
                     Bundle b = new Bundle();
                     b.putInt("position", position);
-                    b.putSerializable("data", (Serializable) list_data.get(position));
-                    listFragment.get(position).setArguments(b);
+                    b.putSerializable("data", (Serializable) listData.get(position));
+                    fragmentList.get(position).setArguments(b);
                 }
-                return listFragment.get(position);
+                return fragmentList.get(position);
             } else {
-                for (int i = listFragment.size(); i < position; i++) {
-                    listFragment.add(null);
-                }
-                Fragment fragment = (Fragment) (list_fragment.get(position)).newInstance();
+                Fragment fragment = (Fragment) (fragmentClassList.get(position)).newInstance();
                 Bundle b = new Bundle();
                 b.putInt("position", position);
-                b.putSerializable("data", (Serializable) list_data.get(position));
+                b.putSerializable("data", (Serializable) listData.get(position));
                 fragment.setArguments(b);
-                listFragment.add(fragment);
-                return listFragment.get(position);
+                fragmentList.add(fragment);
+                return fragmentList.get(position);
             }
         } catch (InstantiationException e) {
             e.printStackTrace();
@@ -89,7 +83,7 @@ public class DragStatePagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return list_fragment.size();
+        return fragmentClassList.size();
     }
 
     public int getItemPosition(Object object) {
@@ -99,7 +93,7 @@ public class DragStatePagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         super.destroyItem(container, position, object);
-        listFragment.set(position, null);
+        fragmentList.set(position, null);
     }
 
     @Override

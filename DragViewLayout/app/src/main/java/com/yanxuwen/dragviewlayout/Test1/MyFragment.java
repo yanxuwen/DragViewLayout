@@ -37,6 +37,24 @@ public class MyFragment extends Fragment implements AllowDragListener {
     private boolean isLongTop;//长图是否在顶部
 
     @Override
+    public void onResume() {
+        super.onResume();
+        Log.e("yxw","onResume" + position);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.e("yxw","onPause" + position);
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean hidden) {
+        super.setUserVisibleHint(hidden);
+        Log.e("yxw",position + "_setUserVisibleHint_" + hidden);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         parent = inflater.inflate(R.layout.fragment, null);
@@ -53,7 +71,7 @@ public class MyFragment extends Fragment implements AllowDragListener {
         text.setText(position + "???" + data);
         Glide.with(getContext())
                 .asBitmap()
-                .load(R.mipmap.test)
+                .load(R.mipmap.ic_launcher)
                 .into(new ImageViewTarget<Bitmap>(photoView) {
                     @Override
                     protected void setResource(@Nullable Bitmap resource) {
