@@ -8,12 +8,10 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.FloatRange;
@@ -551,6 +549,7 @@ public class DragViewLayout extends RelativeLayout {
                         mOnDrawerStatusListener.onStatus(CLOSE);
                 }
             }
+
             /**指定位置，拖曳***/
             else if (isOpen()) {
                 mDragOffset = (float) (top - firstTop) / (getHeight() - firstTop);
