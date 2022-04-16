@@ -15,7 +15,7 @@ import com.bumptech.glide.Priority;
 import com.bumptech.glide.request.RequestOptions;
 import com.yanxuwen.dragview.DragViewDialog;
 import com.yanxuwen.dragview.DragViewLayout;
-import com.yanxuwen.dragview.listener.OnDataListener;
+import com.yanxuwen.dragview.listener.Listener;
 import com.yanxuwen.dragview.listener.OnDrawerOffsetListener;
 import com.yanxuwen.dragviewlayout.R;
 import com.yanxuwen.dragviewlayout.Test1.MyFragment;
@@ -29,7 +29,7 @@ public class TestActivity3 extends FragmentActivity {
     final ArrayList<Class<? extends Fragment>> listfragemnt = new ArrayList<>();
     private View view_test3;
     private Context context;
-    private DragViewDialog dialogFragment;
+    private DragViewDialog dragViewDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,76 +54,35 @@ public class TestActivity3 extends FragmentActivity {
     }
 
     public void open() {
-        dialogFragment = DragViewDialog.show(this, 0, new OnDataListener() {
-            TextView text_abstract = null;
-
-            @Override
-            public View getCurView(int position) {
-                return views.get(position);
-            }
-
-            @Override
-            public ArrayList<Object> getListData() {
-                return listdata;
-            }
-
-            @Override
-            public ArrayList<Class<? extends Fragment>> getListFragmentClass() {
-                return listfragemnt;
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                if (position == 0 && listdata.size() < 3) {
-                    //更加数据
-                    listdata.add("sdsds3");
-                    listdata.add("sdsds4");
-                    views.add(v1);
-                    views.add(v1);
-                    listfragemnt.add(MyFragment.class);
-                    listfragemnt.add(MyFragment.class);
-                    notifyDataSetChanged();
-                }
-                if (text_abstract != null) {
-                    text_abstract.setText((position + 1) + "/" + 3 + " 从第一张照片XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-                }
-
-            }
-
-            @Override
-            public boolean onBackPressed() {
-                return true;
-            }
-
-            @Override
-            public void init() {
-                if (view_test3 == null) {
-                    view_test3 = getLayoutInflater().inflate(R.layout.view_test3, null);
-                }
-                dialogFragment.getParent().addView(view_test3);
-                text_abstract = (TextView) view_test3.findViewById(R.id.text);
-                dialogFragment.setOnDrawerOffsetListener(new OnDrawerOffsetListener() {
-                    @Override
-                    public void onDrawerOffset(@FloatRange(from = 0, to = 1) float offset) {
-                        if (view_test3 != null) {
-                            view_test3.setAlpha(offset - 0.3f);
-                        }
-                    }
+        dragViewDialog = new DragViewDialog.Builder(this)
+                .setData(listdata, listfragemnt, views)
+                .setViewPage2(true)
+                .setListener(new Listener() {
+                    TextView text_abstract = null;
 
                     @Override
-                    public void onDragStatus(int status) {
-                        if (status == DragViewLayout.CLOSE) {
-                            dialogFragment.getDragViewLayout().removeView(view_test3);
-                            view_test3 = null;
+                    public void onPageSelected(int position) {
+                        super.onPageSelected(position);
+                        if (position == 0 && listdata.size() < 3) {
+                            //更加数据
+                            listdata.add("sdsds2");
+                            listdata.add("sdsds3");
+                            views.add(v1);
+                            views.add(v1);
+                            listfragemnt.add(MyFragment.class);
+                            listfragemnt.add(MyFragment.class);
+                            notifyDataSetChanged();
                         }
+                        if (text_abstract != null) {
+                            text_abstract.setText((position + 1) + "/" + 3 + " 从第一张照片XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+                        }
+
                     }
-                });
-            }
-        });
+                }).show();
     }
 
 
     public void notifyDataSetChanged() {
-        dialogFragment.notifyDataSetChanged();
+        dragViewDialog.notifyDataSetChanged();
     }
 }
