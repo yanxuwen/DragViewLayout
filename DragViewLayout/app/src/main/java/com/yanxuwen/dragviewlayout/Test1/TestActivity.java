@@ -11,15 +11,16 @@ import com.yanxuwen.dragview.DragViewDialog;
 import com.yanxuwen.dragview.listener.Listener;
 import com.yanxuwen.dragviewlayout.R;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class TestActivity extends FragmentActivity {
     public View v1;
     public View v2;
-    final ArrayList<View> views = new ArrayList<>();
-    final ArrayList<Object> listdata = new ArrayList<>();
-    final ArrayList<Class<? extends Fragment>> listfragemnt = new ArrayList<>();
-    private DragViewDialog dialogFragment;
+    final List<View> views = new ArrayList<>();
+    final List<Serializable> listdata = new ArrayList<>();
+    final List<Class<? extends Fragment>> listfragemnt = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +33,7 @@ public class TestActivity extends FragmentActivity {
         listfragemnt.add(MyFragment.class);
         listfragemnt.add(MyFragment.class);
 
-        listdata.add("sdsds1");
+        listdata.add("sdsd1");
         listdata.add("sdsds2");
         v1.setOnClickListener(new View.OnClickListener() {
             @Override

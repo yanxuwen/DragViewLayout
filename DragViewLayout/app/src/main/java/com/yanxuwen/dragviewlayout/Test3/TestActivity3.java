@@ -6,28 +6,24 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.FloatRange;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.Priority;
-import com.bumptech.glide.request.RequestOptions;
 import com.yanxuwen.dragview.DragViewDialog;
-import com.yanxuwen.dragview.DragViewLayout;
 import com.yanxuwen.dragview.listener.Listener;
-import com.yanxuwen.dragview.listener.OnDrawerOffsetListener;
 import com.yanxuwen.dragviewlayout.R;
 import com.yanxuwen.dragviewlayout.Test1.MyFragment;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class TestActivity3 extends FragmentActivity {
     public ImageView v1;
-    final ArrayList<View> views = new ArrayList<>();
-    final ArrayList<Object> listdata = new ArrayList<>();
-    final ArrayList<Class<? extends Fragment>> listfragemnt = new ArrayList<>();
-    private View view_test3;
+    final List<View> views = new ArrayList<>();
+    final List<Serializable> listdata = new ArrayList<>();
+    final List<Class<? extends Fragment>> listfragemnt = new ArrayList<>();
     private Context context;
     private DragViewDialog dragViewDialog;
 
@@ -38,18 +34,17 @@ public class TestActivity3 extends FragmentActivity {
         context = this;
         v1 = (ImageView) findViewById(R.id.image);
         views.add(v1);
-        listfragemnt.add(MyFragment.class);
-        listdata.add("sdsds1");
+        listfragemnt.add(MyFragment3.class);
+        PictureData pictureData = new PictureData(R.mipmap.longphoto, "长图");
+        listdata.add(pictureData);
         v1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 open();
             }
         });
-        RequestOptions options3 = new RequestOptions()
-                .centerCrop()
-                .priority(Priority.HIGH);
-        Glide.with(context).load("http://aiyuxm.com/619744a7a1710f3117f4187f_1641631229437_2").into(v1);
+
+        Glide.with(context).load(pictureData.getIdRes()).into(v1);
 
     }
 

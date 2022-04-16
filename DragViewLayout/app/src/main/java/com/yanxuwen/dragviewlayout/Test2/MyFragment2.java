@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.yanxuwen.dragview.DrawData;
+import com.yanxuwen.dragviewlayout.ColorData;
 import com.yanxuwen.dragviewlayout.R;
 
 /**
@@ -19,10 +21,21 @@ import com.yanxuwen.dragviewlayout.R;
  */
 
 public class MyFragment2 extends Fragment {
+    ColorData data;
+    private TextView text;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View parent = inflater.inflate(R.layout.fragment2, null);
+        text = parent.findViewById(R.id.text);
+        init();
         return parent;
+    }
+
+    private void init() {
+        DrawData<ColorData> drawData = new DrawData(getArguments());
+        data = drawData.getData();
+        text.setBackgroundResource(data.getIdRes());
     }
 }

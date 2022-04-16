@@ -22,21 +22,21 @@ import java.util.List;
  * ViewPage2使用
  */
 public class DragStatePagerAdapter2 extends FragmentStateAdapter {
-    public List<Object> listData;
+    public List<? extends Serializable> listData;
     private List<Fragment> fragmentList = new ArrayList<>();
     public List<Class<? extends Fragment>> fragmentClassList;
     private List<Long> fragmentIds = new ArrayList<>();//用于存储更新fragment的特定标识
     private HashSet<Long> creatIds = new HashSet<>();//得用hashset防重，用于存储adapter内的顺序
 
 
-    public DragStatePagerAdapter2(@NonNull FragmentActivity fragmentActivity, List<Class<? extends Fragment>> fragmentClassList, List<Object> listData) {
+    public DragStatePagerAdapter2(@NonNull FragmentActivity fragmentActivity, List<Class<? extends Fragment>> fragmentClassList, List<? extends Serializable> listData) {
         super(fragmentActivity);
         this.fragmentClassList = fragmentClassList;
         this.listData = listData;
         updateIds(listData);
     }
 
-    public DragStatePagerAdapter2(@NonNull FragmentManager fragmentManager, List<Class<? extends Fragment>> fragmentClassList, List<Object> listData) {
+    public DragStatePagerAdapter2(@NonNull FragmentManager fragmentManager, List<Class<? extends Fragment>> fragmentClassList, List<? extends Serializable> listData) {
         super(fragmentManager, new Lifecycle() {
             @Override
             public void addObserver(@NonNull LifecycleObserver observer) {
@@ -59,7 +59,7 @@ public class DragStatePagerAdapter2 extends FragmentStateAdapter {
         updateIds(listData);
     }
 
-    public DragStatePagerAdapter2(@NonNull Fragment fragment, List<Class<? extends Fragment>> fragmentClassList, List<Object> listData) {
+    public DragStatePagerAdapter2(@NonNull Fragment fragment, List<Class<? extends Fragment>> fragmentClassList, List<? extends Serializable> listData) {
         super(fragment);
         this.fragmentClassList = fragmentClassList;
         this.listData = listData;
@@ -152,7 +152,7 @@ public class DragStatePagerAdapter2 extends FragmentStateAdapter {
     }
 
 
-    public void updateIds(List<Object> listData) {
+    public void updateIds(List<? extends Serializable> listData) {
         fragmentIds.clear();
         for (int i = 0; i < listData.size(); i++) {
             fragmentIds.add(Long.parseLong(i + ""));

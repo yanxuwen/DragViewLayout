@@ -22,8 +22,8 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.yanxuwen.dragview.listener.Listener;
-import com.yanxuwen.dragview.listener.OnDrawerOffsetListener;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +76,7 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
          * @param fragmentClassList Fragment.class列表 不能为空
          * @param listView          View 列表，用于展示启动动画跟关闭动画  允许为空，为空的画，则没有拖拽动画
          */
-        public Builder setData(@NonNull List<Object> listData, @NonNull List<Class<? extends Fragment>> fragmentClassList, List<View> listView) {
+        public Builder setData(@NonNull List<? extends Serializable> listData, @NonNull List<Class<? extends Fragment>> fragmentClassList, List<View> listView) {
             mController.listData = listData;
             mController.fragmentClassList = fragmentClassList;
             mController.listView = listView;
@@ -90,8 +90,8 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
          * @param fragmentClass Fragment.class 不能为空
          * @param view          View 用于展示启动动画跟关闭动画  允许为空，为空的画，则没有拖拽动画
          */
-        public Builder setData(@NonNull Object object, @NonNull Class<? extends Fragment> fragmentClass, View view) {
-            List<Object> listData = new ArrayList<>();
+        public Builder setData(@NonNull Serializable object, @NonNull Class<? extends Fragment> fragmentClass, View view) {
+            List<Serializable> listData = new ArrayList<>();
             List<Class<? extends Fragment>> fragmentClassList = new ArrayList<>();
             List<View> listView = new ArrayList<>();
             listData.add(object);

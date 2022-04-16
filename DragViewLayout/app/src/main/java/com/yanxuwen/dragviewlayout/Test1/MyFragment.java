@@ -19,6 +19,7 @@ import com.davemorrissey.labs.subscaleview.ImageViewState;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.yanxuwen.dragview.AllowDragListener;
+import com.yanxuwen.dragview.DrawData;
 import com.yanxuwen.dragviewlayout.R;
 
 /**
@@ -29,7 +30,7 @@ public class MyFragment extends Fragment implements AllowDragListener {
     View parent;
     TextView text;
     private int position;
-    private Object data;
+    private String data;
     private PhotoView photoView;
     private SubsamplingScaleImageView longImageView;
     private boolean eqLongImage;
@@ -66,8 +67,9 @@ public class MyFragment extends Fragment implements AllowDragListener {
         text = parent.findViewById(R.id.text);
         photoView = parent.findViewById(R.id.photoView);
         longImageView = parent.findViewById(R.id.imageView);
-        position = getArguments().getInt("position");
-        data = getArguments().getSerializable("data");
+        DrawData<String> drawData = new DrawData(getArguments());
+        position = drawData.getPosition();
+        data = drawData.getData();
         text.setText(position + "???" + data);
         Glide.with(getContext())
                 .asBitmap()

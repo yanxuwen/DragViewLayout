@@ -11,20 +11,20 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="多个"
+        android:text="可缩放图片"
         android:onClick="onClickView"
         />
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="单个"
+        android:text="仿今日头条类型"
         android:onClick="onClickView2"
 
         />
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="图片浏览"
+        android:text="长图"
         android:onClick="onClickView3"
         />
 </LinearLayout>

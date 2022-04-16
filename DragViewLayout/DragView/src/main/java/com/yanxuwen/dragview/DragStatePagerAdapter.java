@@ -22,11 +22,11 @@ import java.util.List;
  * 如果设置了setOffscreenPageLimit就会缓存几页，不会被销毁
  */
 public class DragStatePagerAdapter extends FragmentStatePagerAdapter {
-    public List<Object> listData;
+    public List<? extends Serializable> listData;
     public List<Class<? extends Fragment>> fragmentClassList;
     public List<Fragment> fragmentList;
 
-    public DragStatePagerAdapter(FragmentManager fm, List<Class<? extends Fragment>> fragmentClassList, List<Object> listData) {
+    public DragStatePagerAdapter(FragmentManager fm, List<Class<? extends Fragment>> fragmentClassList, List<? extends Serializable> listData) {
         super(fm);
         this.fragmentClassList = fragmentClassList;
         this.listData = listData;
