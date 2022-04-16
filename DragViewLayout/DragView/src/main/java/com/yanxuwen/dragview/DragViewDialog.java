@@ -1,99 +1,34 @@
 package com.yanxuwen.dragview;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageView;
 
 import androidx.annotation.FloatRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.yanxuwen.dragview.listener.OnDataListener;
+import com.yanxuwen.dragview.listener.OnDrawerOffsetListener;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Map;
 
-public class DragViewDialogFragment extends DialogFragment implements DragViewLayout.OnDrawerStatusListener, DragViewLayout.OnCurViewListener, ViewPager.OnPageChangeListener {
-
-    public interface OnDataListener {
-
-        public View getCurView(int position);
-
-        /**
-         * 数据列表
-         */
-        public ArrayList<Object> getListData();
-
-        /**
-         * Frament列表，注意是Frament.class列表
-         */
-        public ArrayList<Class<? extends Fragment>> getListFragmentClass();
-
-        public void onPageSelected(int position);
-
-        /**
-         * true 代表运行执行onBackPressed，false则禁止onBackPressed
-         */
-        public boolean onBackPressed();
-
-        /**
-         * 处理一些初始化操作
-         */
-        public void init();
-
-
-    }
-
-    DragViewDialogFragment.OnDataListener mOnDataListener = null;
-
-    public void setOnDataListener(DragViewDialogFragment.OnDataListener l) {
-        mOnDataListener = l;
-    }
-
-    public void removeOnDataListener() {
-        mOnDataListener = null;
-    }
-
-    /**
-     * 拖动偏移量
-     */
-    public interface OnDrawerOffsetListener {
-        /**
-         * 拖动偏移量变化为1-0  1为显示状态，0为关闭
-         */
-        void onDrawerOffset(@FloatRange(from = 0, to = 1) float offset);
-
-        void onDragStatus(int status);
-    }
-
-    DragViewDialogFragment.OnDrawerOffsetListener mOnDrawerOffsetListener = null;
-
-    public void setOnDrawerOffsetListener(DragViewDialogFragment.OnDrawerOffsetListener l) {
-        mOnDrawerOffsetListener = l;
-    }
-
-    public void removeOnDrawerOffsetListener() {
-        mOnDrawerOffsetListener = null;
-    }
+public class DragViewDialog extends DialogFragment implements DragViewLayout.OnDrawerStatusListener, DragViewLayout.OnCurViewListener, ViewPager.OnPageChangeListener {
 
     private DragViewLayout dragViewLayout;
-
     public ViewPager viewPager;
     public DragStatePagerAdapter mMPagerAdapter;
     public ViewPager2 viewPager2;
@@ -102,29 +37,23 @@ public class DragViewDialogFragment extends DialogFragment implements DragViewLa
     private int currentPosition;
     private ViewGroup parent;
     private boolean isViewPage2 = true;//是否使用ViewPage2
+    private OnDataListener mOnDataListener = null;
+    private OnDrawerOffsetListener mOnDrawerOffsetListener = null;
 
-    public static DragViewDialogFragment show(FragmentActivity fragmentActivity, int position, DragViewDialogFragment.OnDataListener listener) {
-        DragViewDialogFragment dialogFragment = DragViewDialogFragment.newInstance();
+    public static DragViewDialog show(FragmentActivity fragmentActivity, int position, OnDataListener listener) {
+        DragViewDialog dialogFragment = DragViewDialog.newInstance();
         dialogFragment.setOnDataListener(listener);
         dialogFragment.setCurrentPosition(position);
         dialogFragment.showAllowingStateLoss(fragmentActivity.getSupportFragmentManager(), "tag");
         return dialogFragment;
     }
 
-    public static DragViewDialogFragment newInstance() {
-        DragViewDialogFragment fragment = new DragViewDialogFragment();
+    public static DragViewDialog newInstance() {
+        DragViewDialog fragment = new DragViewDialog();
         Bundle bundle = new Bundle();
 
         fragment.setArguments(bundle);
         return fragment;
-    }
-
-    public void notifyDataSetChanged() {
-        if (isViewPage2) {
-            mMPagerAdapter2.update();
-        } else {
-            mMPagerAdapter.notifyDataSetChanged();
-        }
     }
 
     @Override
@@ -168,19 +97,19 @@ public class DragViewDialogFragment extends DialogFragment implements DragViewLa
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                     super.onPageScrolled(position, positionOffset, positionOffsetPixels);
-                    DragViewDialogFragment.this.onPageScrolled(position, positionOffset, positionOffsetPixels);
+                    DragViewDialog.this.onPageScrolled(position, positionOffset, positionOffsetPixels);
                 }
 
                 @Override
                 public void onPageSelected(int position) {
                     super.onPageSelected(position);
-                    DragViewDialogFragment.this.onPageSelected(position);
+                    DragViewDialog.this.onPageSelected(position);
                 }
 
                 @Override
                 public void onPageScrollStateChanged(int state) {
                     super.onPageScrollStateChanged(state);
-                    DragViewDialogFragment.this.onPageScrollStateChanged(state);
+                    DragViewDialog.this.onPageScrollStateChanged(state);
                 }
             });
             viewPager2.setCurrentItem(currentPosition);
@@ -346,6 +275,31 @@ public class DragViewDialogFragment extends DialogFragment implements DragViewLa
         FragmentTransaction ft = manager.beginTransaction();
         ft.add(this, tag);
         ft.commitAllowingStateLoss();
+    }
+
+    public void notifyDataSetChanged() {
+        if (isViewPage2) {
+            mMPagerAdapter2.update();
+        } else {
+            mMPagerAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public void setOnDataListener(OnDataListener l) {
+        mOnDataListener = l;
+    }
+
+    public void removeOnDataListener() {
+        mOnDataListener = null;
+    }
+
+
+    public void setOnDrawerOffsetListener(OnDrawerOffsetListener l) {
+        mOnDrawerOffsetListener = l;
+    }
+
+    public void removeOnDrawerOffsetListener() {
+        mOnDrawerOffsetListener = null;
     }
 
     /**

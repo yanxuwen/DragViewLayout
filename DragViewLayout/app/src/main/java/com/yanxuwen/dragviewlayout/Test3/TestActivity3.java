@@ -1,9 +1,7 @@
 package com.yanxuwen.dragviewlayout.Test3;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,10 +12,11 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
-import com.yanxuwen.dragview.DragViewDialogFragment;
+import com.yanxuwen.dragview.DragViewDialog;
 import com.yanxuwen.dragview.DragViewLayout;
+import com.yanxuwen.dragview.listener.OnDataListener;
+import com.yanxuwen.dragview.listener.OnDrawerOffsetListener;
 import com.yanxuwen.dragviewlayout.R;
 import com.yanxuwen.dragviewlayout.Test1.MyFragment;
 
@@ -30,7 +29,7 @@ public class TestActivity3 extends FragmentActivity {
     final ArrayList<Class<? extends Fragment>> listfragemnt = new ArrayList<>();
     private View view_test3;
     private Context context;
-    private DragViewDialogFragment dialogFragment;
+    private DragViewDialog dialogFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +54,7 @@ public class TestActivity3 extends FragmentActivity {
     }
 
     public void open() {
-        dialogFragment = DragViewDialogFragment.show(this, 0, new DragViewDialogFragment.OnDataListener() {
+        dialogFragment = DragViewDialog.show(this, 0, new OnDataListener() {
             TextView text_abstract = null;
 
             @Override
@@ -103,7 +102,7 @@ public class TestActivity3 extends FragmentActivity {
                 }
                 dialogFragment.getParent().addView(view_test3);
                 text_abstract = (TextView) view_test3.findViewById(R.id.text);
-                dialogFragment.setOnDrawerOffsetListener(new DragViewDialogFragment.OnDrawerOffsetListener() {
+                dialogFragment.setOnDrawerOffsetListener(new OnDrawerOffsetListener() {
                     @Override
                     public void onDrawerOffset(@FloatRange(from = 0, to = 1) float offset) {
                         if (view_test3 != null) {

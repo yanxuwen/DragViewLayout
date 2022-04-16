@@ -67,7 +67,7 @@ public class DragViewLayout extends RelativeLayout {
     /**
      * 拖动偏移量
      */
-    public interface OnDrawerOffsetListener {
+    protected interface OnDrawerOffsetListener {
         /**
          * 拖动偏移量变化为1-0  1为显示状态，0为关闭
          */

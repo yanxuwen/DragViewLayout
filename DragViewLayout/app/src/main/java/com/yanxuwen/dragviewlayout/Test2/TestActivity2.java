@@ -6,7 +6,8 @@ import android.view.View;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
-import com.yanxuwen.dragview.DragViewDialogFragment;
+import com.yanxuwen.dragview.DragViewDialog;
+import com.yanxuwen.dragview.listener.OnDataListener;
 import com.yanxuwen.dragviewlayout.R;
 
 import java.util.ArrayList;
@@ -33,10 +34,10 @@ public class TestActivity2 extends FragmentActivity {
         });
     }
 
-    DragViewDialogFragment dialogFragment;
+    DragViewDialog dialogFragment;
 
     public void open() {
-        dialogFragment = DragViewDialogFragment.show(this, 0, new DragViewDialogFragment.OnDataListener() {
+        dialogFragment = DragViewDialog.show(this, 0, new OnDataListener() {
 
             @Override
             public View getCurView(int position) {

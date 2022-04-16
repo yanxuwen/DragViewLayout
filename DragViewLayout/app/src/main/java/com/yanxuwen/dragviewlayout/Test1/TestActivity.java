@@ -7,7 +7,8 @@ import android.view.View;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
-import com.yanxuwen.dragview.DragViewDialogFragment;
+import com.yanxuwen.dragview.DragViewDialog;
+import com.yanxuwen.dragview.listener.OnDataListener;
 import com.yanxuwen.dragviewlayout.R;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class TestActivity extends FragmentActivity {
     final ArrayList<View> views = new ArrayList<>();
     final ArrayList<Object> listdata = new ArrayList<>();
     final ArrayList<Class<? extends Fragment>> listfragemnt = new ArrayList<>();
-    private DragViewDialogFragment dialogFragment;
+    private DragViewDialog dialogFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +51,7 @@ public class TestActivity extends FragmentActivity {
     }
 
     public void open(int position) {
-        dialogFragment = DragViewDialogFragment.show(this, 1, new DragViewDialogFragment.OnDataListener() {
+        dialogFragment = DragViewDialog.show(this, 0, new OnDataListener() {
             @Override
             public View getCurView(int position) {
                 return views.get(position);
