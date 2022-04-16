@@ -261,8 +261,8 @@ public class DragViewLayout extends RelativeLayout {
     }
 
     private void init() {
-
-
+        closing = false;
+        staring = false;
     }
 
     public void setStartView(final ImageBean mImageBean) {
@@ -494,7 +494,6 @@ public class DragViewLayout extends RelativeLayout {
                 //关闭
                 if (change == 1) {
                     isScrolling = false;
-                    closing = false;
                     if (mOnDrawerStatusListener != null)
                         mOnDrawerStatusListener.onStatus(CLOSE);
                 }
@@ -548,7 +547,6 @@ public class DragViewLayout extends RelativeLayout {
                 if (mOnDrawerOffsetListener != null) mOnDrawerOffsetListener.onDrawerOffset(change);
                 if (change == 0) {
                     isScrolling = false;
-                    closing = false;
                     if (mOnDrawerStatusListener != null)
                         mOnDrawerStatusListener.onStatus(CLOSE);
                 }
