@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:visibility="invisible">
 
-        <androidx.viewpager.widget.ViewPager
+        <com.yanxuwen.dragview.DragViewPager
             android:id="@+id/viewPager"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

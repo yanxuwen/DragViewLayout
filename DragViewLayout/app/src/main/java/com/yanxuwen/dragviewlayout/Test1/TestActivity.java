@@ -30,11 +30,18 @@ public class TestActivity extends FragmentActivity {
         v2 = findViewById(R.id.text2);
         views.add(v1);
         views.add(v2);
+        views.add(v1);
+        views.add(v2);
+        listfragemnt.add(MyFragment.class);
+        listfragemnt.add(MyFragment.class);
         listfragemnt.add(MyFragment.class);
         listfragemnt.add(MyFragment.class);
 
-        listdata.add("sdsd1");
-        listdata.add("sdsds2");
+
+        listdata.add("第一张");
+        listdata.add("第二张");
+        listdata.add("第三张");
+        listdata.add("第四张");
         v1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,7 +61,7 @@ public class TestActivity extends FragmentActivity {
     public void open(int position) {
         new DragViewDialog.Builder(this)
                 .setData(listdata, listfragemnt, views)
-                .setViewPage2(true)
+                .setViewPage2(position == 1 ? true : false)
                 .setDefaultPosition(position)
                 .setListener(new Listener() {
                     @Override

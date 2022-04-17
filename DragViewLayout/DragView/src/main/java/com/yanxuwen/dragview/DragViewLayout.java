@@ -8,6 +8,7 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -128,6 +129,7 @@ public class DragViewLayout extends RelativeLayout {
     private DragStatePagerAdapter viewPagerAdapter;
     private ViewPager2 viewPager2;
     private DragStatePagerAdapter2 viewPagerAdapter2;
+    private boolean doublePointerCount;
 
     public DragViewLayout(Context context) {
         super(context);
@@ -674,28 +676,33 @@ public class DragViewLayout extends RelativeLayout {
     }
 
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (ev.getPointerCount() > 1) return super.dispatchTouchEvent(ev);
         try {
             switch (ev.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     touchX = ev.getX();
                     touchY = ev.getY();
+                    if (ev.getPointerCount() > 1) {
+                        doublePointerCount = true;
+                    }
                     break;
                 case MotionEvent.ACTION_MOVE:
+                    if (ev.getPointerCount() > 1) {
+                        doublePointerCount = true;
+                    }
                     float dx = ev.getX() - touchX;
                     float dy = ev.getY() - touchY;
-                    isVertical = (Math.abs(dy) > Math.abs(dx));
                     touchX = ev.getX();
                     touchY = ev.getY();
-                    if (viewPager != null) {
-                        viewPager.dispatchTouchEvent(ev);
-                    }
-                    if (viewPager2 != null) {
-                        viewPager2.dispatchTouchEvent(ev);
+                    if (!doublePointerCount) {
+                        isVertical = (Math.abs(dy) > Math.abs(dx));
                     }
                     break;
                 case MotionEvent.ACTION_UP:
                 case MotionEvent.ACTION_CANCEL:
+                    //只有最后一只手放开，才能false,如果本来2只手指，突然变化一只手指，这时候也认定为2只手指，避免一些冲突
+                    if (ev.getPointerCount() == 1) {
+                        doublePointerCount = false;
+                    }
                     touchX = 0;
                     touchY = 0;
                     isVertical = false;
@@ -703,6 +710,7 @@ public class DragViewLayout extends RelativeLayout {
             }
         } catch (Exception e) {
         }
+
         return super.dispatchTouchEvent(ev);
     }
 
@@ -719,7 +727,7 @@ public class DragViewLayout extends RelativeLayout {
                 }
             }
         }
-        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+        if (ev.getPointerCount() == 1 && ev.getAction() == MotionEvent.ACTION_DOWN) {
             //ACTION_DOWN 需要执行下onTouchEvent，因为如果嵌套了PhotoView的画，ACTION_DOWN是不会触发onTouchEvent的，
             //导致拖拽不灵敏问题
             onTouchEvent(ev);

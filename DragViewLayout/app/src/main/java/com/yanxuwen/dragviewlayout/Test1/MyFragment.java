@@ -70,7 +70,7 @@ public class MyFragment extends Fragment implements AllowDragListener {
         DrawData<String> drawData = new DrawData(getArguments());
         position = drawData.getPosition();
         data = drawData.getData();
-        text.setText(position + "???" + data);
+        text.setText(position + "____" + data);
         Glide.with(getContext())
                 .asBitmap()
                 .load(R.mipmap.ic_launcher)
