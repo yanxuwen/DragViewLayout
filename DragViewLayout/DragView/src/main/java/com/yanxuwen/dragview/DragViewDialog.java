@@ -222,13 +222,13 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
                     DragViewDialog.this.onPageScrollStateChanged(state);
                 }
             });
-            viewPager2.setCurrentItem(currentPosition);
+            viewPager2.setCurrentItem(currentPosition, false);
         } else {
             setDragView(viewPager);
             mMPagerAdapter = new DragStatePagerAdapter(getChildFragmentManager(), mController.fragmentClassList, mController.listData);
             viewPager.setAdapter(mMPagerAdapter);
             viewPager.addOnPageChangeListener(this);
-            viewPager.setCurrentItem(currentPosition);
+            viewPager.setCurrentItem(currentPosition, false);
             if (currentPosition == 0) {
                 onPageSelected(currentPosition);
             }
