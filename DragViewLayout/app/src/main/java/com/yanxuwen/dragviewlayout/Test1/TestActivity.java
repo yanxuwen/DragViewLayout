@@ -73,12 +73,6 @@ public class TestActivity extends FragmentActivity {
                         return views.get(position);
                     }
                 }).show();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                dialog.dismiss();
-            }
-        },3000);
     }
 
 }

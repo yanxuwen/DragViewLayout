@@ -152,8 +152,8 @@ public class DragViewLayout extends RelativeLayout {
         View view = getChildAt(0);
         if (view instanceof ViewPager) {
             viewPager = (ViewPager) view;
-        } else if (view instanceof ViewPager2) {
-            viewPager2 = (ViewPager2) view;
+        } else if (view instanceof ViewPager2Container) {
+            viewPager2 = (ViewPager2) ((ViewPager2Container) view).getChildAt(0);
         }
     }
 
