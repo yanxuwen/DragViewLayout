@@ -22,13 +22,11 @@ import com.yanxuwen.dragviewlayout.R;
 
 public class MyFragment2 extends Fragment {
     ColorData data;
-    private TextView text;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View parent = inflater.inflate(R.layout.fragment2, null);
-        text = parent.findViewById(R.id.text);
         init();
         return parent;
     }
@@ -36,6 +34,5 @@ public class MyFragment2 extends Fragment {
     private void init() {
         DrawData<ColorData> drawData = new DrawData(getArguments());
         data = drawData.getData();
-        text.setBackgroundResource(data.getIdRes());
     }
 }

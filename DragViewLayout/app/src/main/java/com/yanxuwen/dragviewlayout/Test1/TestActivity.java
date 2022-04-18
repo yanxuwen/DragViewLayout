@@ -1,7 +1,11 @@
 package com.yanxuwen.dragviewlayout.Test1;
 
 
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 
 import androidx.fragment.app.Fragment;
@@ -59,16 +63,22 @@ public class TestActivity extends FragmentActivity {
     }
 
     public void open(int position) {
-        new DragViewDialog.Builder(this)
-                .setData(listdata, listfragemnt, views)
+        final DragViewDialog dialog = new DragViewDialog.Builder(this)
+                .setData(listdata, listfragemnt)
                 .setViewPage2(position == 1 ? true : false)
                 .setDefaultPosition(position)
-                .setListener(new Listener() {
-                    @Override
-                    public void onPageSelected(int position) {
-                        super.onPageSelected(position);
+                .setBackgroundResource(android.R.color.black)
+                .setListener(new Listener<String>() {
+                    public View getCurView(int position, String str) {
+                        return views.get(position);
                     }
                 }).show();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                dialog.dismiss();
+            }
+        },3000);
     }
 
 }

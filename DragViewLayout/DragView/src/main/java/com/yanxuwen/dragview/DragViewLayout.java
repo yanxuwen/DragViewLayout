@@ -35,7 +35,7 @@ public class DragViewLayout extends RelativeLayout {
      * 当前要关闭的View的的监听，由于启动的view不受控制，所以位置会随时发生变化，所以要实时监听
      */
     public interface OnCurViewListener {
-        public ImageBean getCurView();
+        public ImageBean getCurViewBean();
     }
 
     OnCurViewListener mOnCurViewListener = null;
@@ -373,7 +373,7 @@ public class DragViewLayout extends RelativeLayout {
 
     public void getCurView() {
         if (closeTop == 0 && closeLeft == 0 && closeHeight == 0 && closeWidth == 0 && closeRight == 0 && closeBottom == 0 && mOnCurViewListener != null) {
-            setCurView(mOnCurViewListener.getCurView());
+            setCurView(mOnCurViewListener.getCurViewBean());
         }
     }
 
@@ -428,7 +428,7 @@ public class DragViewLayout extends RelativeLayout {
     /**
      * 是否是打开状态
      */
-    public boolean isOpen() {
+    private boolean isOpen() {
         if (!closing && !staring) {
             return true;
         }
@@ -546,13 +546,7 @@ public class DragViewLayout extends RelativeLayout {
                 if (isAlpha()) {
                     getDragView().setAlpha(1 - ((1 - dragAlpha) * change));
                 }
-                if (getBgView().getBackground() != null) {
-                    int alpha = (int) ((dragAlpha * change) * 255);
-                    if (alpha > 255) alpha = 255;
-                    else if (alpha < 0) alpha = 0;
-                    getBgView().getBackground().setAlpha(alpha);
-                }
-                if (mOnDrawerOffsetListener != null) mOnDrawerOffsetListener.onDrawerOffset(change);
+                if (mOnDrawerOffsetListener != null) mOnDrawerOffsetListener.onDrawerOffset(((dragAlpha) * change));
                 if (change == 0) {
                     isScrolling = false;
                     if (mOnDrawerStatusListener != null)
@@ -585,12 +579,6 @@ public class DragViewLayout extends RelativeLayout {
                 dragAlpha = 1 - mDragOffset;
                 if (isAlpha()) {
                     getDragView().setAlpha(dragAlpha);
-                }
-                if (getBgView().getBackground() != null) {
-                    int alpha = (int) (dragAlpha * 255);
-                    if (alpha > 255) alpha = 255;
-                    else if (alpha < 0) alpha = 0;
-                    getBgView().getBackground().setAlpha(alpha);
                 }
                 if (mOnDrawerOffsetListener != null)
                     mOnDrawerOffsetListener.onDrawerOffset(dragAlpha);

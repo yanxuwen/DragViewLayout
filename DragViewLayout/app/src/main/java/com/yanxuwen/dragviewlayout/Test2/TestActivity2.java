@@ -1,5 +1,6 @@
 package com.yanxuwen.dragviewlayout.Test2;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -46,10 +47,10 @@ public class TestActivity2 extends FragmentActivity {
 
     public void open() {
         dialog = new DragViewDialog.Builder(this)
-                .setData(listdata, listfragemnt, views)
+                .setData(listdata, listfragemnt)
                 .setViewPage2(true)
-                .setTransparentView(true)
-                .setListener(new Listener() {
+                .setBackgroundColor(Color.parseColor("#333333"))
+                .setListener(new Listener<ColorData>() {
                     TextView text_abstract = null;
 
                     @Override

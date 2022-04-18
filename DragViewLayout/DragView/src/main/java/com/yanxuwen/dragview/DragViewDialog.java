@@ -2,7 +2,9 @@ package com.yanxuwen.dragview;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.FloatRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,8 +41,10 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
     private ViewPager2.OnPageChangeCallback pageChangeCallback2;
     private int currentPosition;
     private ViewGroup parent;
+    private View v_bg;
     private boolean isViewPage2;//是否使用ViewPage2
     protected Controller mController;
+    public int status;
 
     public DragViewDialog(Controller mController) {
         this.mController = mController;
@@ -68,6 +73,7 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
          * 建议开启
          * 启动的View是否透明化，
          * 使得效果更好
+         * 需要Listener监听里的getCurView设置联动View,不然没效果
          */
         public Builder setTransparentView(boolean isTransparentView) {
             mController.isTransparentView = isTransparentView;
@@ -84,12 +90,10 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
          *
          * @param listData          数据列表 不能为空
          * @param fragmentClassList Fragment.class列表 不能为空
-         * @param listView          View 列表，用于启动的View  允许为空，为空的画，则没有拖拽动画
          */
-        public Builder setData(@NonNull List<? extends Serializable> listData, @NonNull List<Class<? extends Fragment>> fragmentClassList, List<View> listView) {
+        public Builder setData(@NonNull List<? extends Serializable> listData, @NonNull List<Class<? extends Fragment>> fragmentClassList) {
             mController.listData = listData;
             mController.fragmentClassList = fragmentClassList;
-            mController.listView = listView;
             return this;
         }
 
@@ -98,18 +102,40 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
          *
          * @param object        数据 不能为空
          * @param fragmentClass Fragment.class 不能为空
-         * @param view          View 用于启动的View  允许为空，为空的画，则没有拖拽动画
          */
-        public Builder setData(@NonNull Serializable object, @NonNull Class<? extends Fragment> fragmentClass, View view) {
+        public Builder setData(@NonNull Serializable object, @NonNull Class<? extends Fragment> fragmentClass) {
             List<Serializable> listData = new ArrayList<>();
             List<Class<? extends Fragment>> fragmentClassList = new ArrayList<>();
-            List<View> listView = new ArrayList<>();
             listData.add(object);
             fragmentClassList.add(fragmentClass);
-            listView.add(view);
             mController.listData = listData;
             mController.fragmentClassList = fragmentClassList;
-            mController.listView = listView;
+            return this;
+        }
+
+        /**
+         * 设置背景资源
+         */
+        public Builder setBackgroundResource(@DrawableRes int backgroundResId) {
+            mController.backgroundResId = backgroundResId;
+            return this;
+        }
+
+        /**
+         * 设置背景颜色
+         */
+        public Builder setBackgroundColor(int color) {
+            mController.bgColor = color;
+            return this;
+        }
+
+        public Builder setCancelable(boolean cancelable) {
+            mController.mCancelable = cancelable;
+            return this;
+        }
+
+        public Builder setOnDismissListener(DialogInterface.OnDismissListener onDismissListener) {
+            mController.mOnDismissListener = onDismissListener;
             return this;
         }
 
@@ -157,11 +183,17 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
         dragViewLayout = parent.findViewById(R.id.dragLayout);
         viewPager = parent.findViewById(R.id.viewPager);
         viewPager2 = parent.findViewById(R.id.viewPager2);
+        v_bg = parent.findViewById(R.id.v_bg);
+        v_bg.setBackgroundResource(mController != null && mController.backgroundResId != 0 ? mController.backgroundResId : android.R.color.transparent);
+        if (mController != null && mController.bgColor != 0) {
+            v_bg.setBackgroundColor(mController.bgColor);
+        }
         dragViewLayout.setOnDrawerStatusListener(this);
         dragViewLayout.setOnCurViewListener(this);
         dragViewLayout.setOnDrawerOffsetListener(new DragViewLayout.OnDrawerOffsetListener() {
             @Override
             public void onDrawerOffset(@FloatRange(from = 0, to = 1) float offset) {
+                v_bg.setAlpha(offset * 2 - 1);
                 if (mController != null && mController.listener != null) {
                     mController.listener.onDrawerOffset(offset);
                 }
@@ -202,16 +234,19 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
             }
         }
 
-        if (mController.listener != null) mController.listener.init();
-
+        if (mController.listener != null) {
+            mController.listener.init();
+        }
+        //该功能失效了
+//        getDialog().setOnDismissListener(mController.mOnDismissListener);
         getDialog().setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
                 if (keyCode == KeyEvent.KEYCODE_BACK) {
-                    if (!dragViewLayout.isOpen()) {
+                    if (status == DragViewLayout.CLOSE) {
                         return true;
                     }
-                    if (mController.listener != null && !mController.listener.onBackPressed()) {
+                    if (mController != null && !mController.mCancelable) {
                         return true;
                     }
                     dragViewLayout.close();
@@ -224,12 +259,6 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
 
     public void setDragView(View dragview) {
         dragViewLayout.setDragView(dragview);
-    }
-
-
-    protected static Intent getExtra(Intent intent, int currentPosition) {
-        intent.putExtra("currentPosition", currentPosition);
-        return intent;
     }
 
     public ArrayList<DragViewLayout.ImageBean> getImageBeans(View[] views) {
@@ -262,18 +291,19 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
 
     @Override
     public void onStatus(int status) {
+        this.status = status;
         if (status == DragViewLayout.OPEN) {
             if (mController != null && mController.isTransparentView) {
                 //隐藏透明View
-                if (mController.listView != null && mController.listView.size() > currentPosition) {
-                    mController.listView.get(currentPosition).setVisibility(View.INVISIBLE);
+                if (getCurView() != null) {
+                    getCurView().setVisibility(View.INVISIBLE);
                 }
             }
         } else if (status == DragViewLayout.CLOSE) {
             if (mController != null && mController.isTransparentView) {
                 //显示当前View
-                if (mController.listView != null && mController.listView.size() > currentPosition) {
-                    mController.listView.get(currentPosition).setVisibility(View.VISIBLE);
+                if (getCurView() != null) {
+                    getCurView().setVisibility(View.VISIBLE);
                 }
             }
             onFinish();
@@ -307,7 +337,7 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
         if (positionOffset == 0) {
             dragViewLayout.setStop(false);
-            dragViewLayout.setStartView(getCurView());
+            dragViewLayout.setStartView(getCurViewBean());
         } else {
             dragViewLayout.setStop(true);
         }
@@ -325,10 +355,22 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
     public void onPageScrollStateChanged(int state) {
     }
 
+    /**
+     * 联动的View
+     */
+    public View getCurView() {
+        View view = null;
+        if (mController.listener != null) {
+            view = mController.listener.getCurView(currentPosition,
+                    mController != null && mController.listData.size() > currentPosition ? mController.listData.get(currentPosition) : null);
+        }
+        return view;
+    }
+
     @Override
-    public DragViewLayout.ImageBean getCurView() {
-        if (mController.listView != null && mController.listView.size() > currentPosition) {
-            return getImageBean(mController.listView.get(currentPosition));
+    public DragViewLayout.ImageBean getCurViewBean() {
+        if (getCurView() != null) {
+            return getImageBean(getCurView());
         }
         return null;
     }
@@ -374,6 +416,27 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
             mMPagerAdapter2.update();
         } else {
             mMPagerAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void dismiss() {
+        if (getDialog() == null || !getDialog().isShowing()) {
+            return;
+        }
+        if (status == DragViewLayout.OPEN) {
+            dragViewLayout.close();
+        } else {
+            super.dismiss();
+        }
+
+    }
+
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
+        if (mController != null && mController.mOnDismissListener != null) {
+            mController.mOnDismissListener.onDismiss(dialog);
         }
     }
 }

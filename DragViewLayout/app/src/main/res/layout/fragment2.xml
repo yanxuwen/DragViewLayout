@@ -8,14 +8,12 @@
     android:layout_marginTop="100dp"
     android:layout_marginBottom="100dp"
     >
-    <TextView
+    <ImageView
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
-        android:gravity="center"
-        android:textSize="16sp"
-        android:background="@color/colorAccent"
+        android:src="@mipmap/ic_launcher"
         >
-    </TextView>
+    </ImageView>
 </RelativeLayout>

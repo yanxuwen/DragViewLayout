@@ -1,6 +1,7 @@
 package com.yanxuwen.dragviewlayout.Test3;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -22,7 +23,7 @@ import java.util.List;
 public class TestActivity3 extends FragmentActivity {
     public ImageView v1;
     final List<View> views = new ArrayList<>();
-    final List<Serializable> listdata = new ArrayList<>();
+    final List<PictureData> listdata = new ArrayList<>();
     final List<Class<? extends Fragment>> listfragemnt = new ArrayList<>();
     private Context context;
     private DragViewDialog dragViewDialog;
@@ -50,9 +51,16 @@ public class TestActivity3 extends FragmentActivity {
 
     public void open() {
         dragViewDialog = new DragViewDialog.Builder(this)
-                .setData(listdata, listfragemnt, views)
+                .setData(listdata, listfragemnt)
                 .setViewPage2(true)
                 .setTransparentView(true)
+                .setBackgroundColor(Color.parseColor("#333333"))
+                .setListener(new Listener<PictureData>() {
+                    @Override
+                    public View getCurView(int position, PictureData pictureData) {
+                        return views.get(position);
+                    }
+                })
                 .show();
     }
 }
