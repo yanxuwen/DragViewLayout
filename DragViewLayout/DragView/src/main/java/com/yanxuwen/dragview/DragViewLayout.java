@@ -5,6 +5,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Rect;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -91,6 +92,7 @@ public class DragViewLayout extends RelativeLayout {
     //停止所以的滚动
     private boolean isStop = false;
     private float mDragOffset;
+    private float offset;
     private float dragAlpha;
     private float dragScale;
     private boolean isCurView;
@@ -110,7 +112,9 @@ public class DragViewLayout extends RelativeLayout {
     private int closeLeft;
     private int closeRight;
     private int closeBottom;
-
+    private float clipTop;
+    private float clipLeft;
+    private boolean clipVertical;//是否是竖方向
     private int closeHeight;
     private int closeWidth;
     float closeScaleY;
@@ -232,8 +236,9 @@ public class DragViewLayout extends RelativeLayout {
         alpha.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                offset = (float) valueAnimator.getAnimatedValue();
                 if (mOnDrawerOffsetListener != null) {
-                    mOnDrawerOffsetListener.onDrawerOffset((float) valueAnimator.getAnimatedValue());
+                    mOnDrawerOffsetListener.onDrawerOffset(offset);
                 }
             }
         });
@@ -291,12 +296,33 @@ public class DragViewLayout extends RelativeLayout {
         setCurView(mImageBean);
         staring = true;
 //        //缩放到关闭的Scale
-        if (getDragView().getHeight() != 0) {
-            closeScaleY = (float) closeHeight / getDragView().getHeight();
+        clipVertical = ((float) getDragView().getHeight() / getDragView().getWidth()) > ((float) closeHeight / closeWidth);
+        if (clipVertical) {
+            if (getDragView().getHeight() != 0) {
+                float clipHeight = ((float) closeHeight / closeWidth) * getDragView().getWidth();
+                clipTop = (getDragView().getHeight() - clipHeight) / 2;
+                //不能除以getDragView().getHeight()，因为我门要先裁剪到跟关闭的视图一样的比例
+                closeScaleY = (float) closeHeight / clipHeight;
+                //closeTop 需要改变，因为没裁剪的时候是刚好，裁剪后，我门要扣掉顶部裁剪的clipTop值，由于缩放，所以clipTop * closeScaleY
+                closeTop = (int) (closeTop - (clipTop * closeScaleY));
+            }
+            if (getDragView().getWidth() != 0) {
+                closeScaleX = (float) closeWidth / getDragView().getWidth();
+            }
+        } else {
+            if (getDragView().getHeight() != 0) {
+                closeScaleY = (float) closeHeight / getDragView().getHeight();
+            }
+            if (getDragView().getWidth() != 0) {
+                float clipWidth = ((float) closeWidth / closeHeight) * getDragView().getHeight();
+                clipLeft = (getDragView().getWidth() - clipWidth) / 2;
+                //不能除以getDragView().getHeight()，因为我门要先裁剪到跟关闭的视图一样的比例
+                closeScaleX = (float) closeHeight / clipWidth;
+                //closeTop 需要改变，因为没裁剪的时候是刚好，裁剪后，我门要扣掉顶部裁剪的clipTop值，由于缩放，所以clipTop * closeScaleY
+                closeLeft = (int) (closeLeft - (clipLeft * closeScaleX));
+            }
         }
-        if (getDragView().getWidth() != 0) {
-            closeScaleX = (float) closeWidth / getDragView().getWidth();
-        }
+
         ObjectAnimator translationX = ObjectAnimator.ofFloat(getDragView(), "translationX", closeLeft - getDragView().getLeft(), 0);
         ObjectAnimator translationY = ObjectAnimator.ofFloat(getDragView(), "translationY", closeTop - getDragView().getTop(), 0);
         //创建透明度动画
@@ -316,8 +342,9 @@ public class DragViewLayout extends RelativeLayout {
         alpha.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                offset = (float) valueAnimator.getAnimatedValue();
                 if (mOnDrawerOffsetListener != null) {
-                    mOnDrawerOffsetListener.onDrawerOffset((float) valueAnimator.getAnimatedValue());
+                    mOnDrawerOffsetListener.onDrawerOffset(offset);
                 }
             }
         });
@@ -497,8 +524,9 @@ public class DragViewLayout extends RelativeLayout {
                     else if (alpha < 0) alpha = 0;
                     getBgView().getBackground().setAlpha(alpha);
                 }
+                offset = 1 - change;
                 if (mOnDrawerOffsetListener != null)
-                    mOnDrawerOffsetListener.onDrawerOffset(1 - change);
+                    mOnDrawerOffsetListener.onDrawerOffset(offset);
                 //关闭
                 if (change == 1) {
                     isScrolling = false;
@@ -541,12 +569,28 @@ public class DragViewLayout extends RelativeLayout {
 
                 getDragView().setPivotX((getDragView().getWidth() * change) / 2);
                 getDragView().setPivotY((getDragView().getHeight() * change) / 2);
-                getDragView().setScaleX(newscaleX);
-                getDragView().setScaleY(newscaleY);
+                try {
+                    getDragView().setScaleX(newscaleX);
+                    getDragView().setScaleY(newscaleY);
+                } catch (Exception e) {
+                    //有时候会抛出    java.lang.IllegalArgumentException: Cannot set 'scaleX' to Float.NaN
+                    //待解
+                    e.printStackTrace();
+                }
+                if (clipVertical) {
+                    int clip = (int) (clipTop * (1 - change));
+                    getDragView().setClipBounds(new Rect(0, clip, getDragView().getWidth(), getDragView().getHeight() - clip));
+                } else {
+                    int clip = (int) (clipLeft * (1 - change));
+                    getDragView().setClipBounds(new Rect(clip, 0, getDragView().getWidth() - clip, getDragView().getHeight()));
+                }
                 if (isAlpha()) {
                     getDragView().setAlpha(1 - ((1 - dragAlpha) * change));
                 }
-                if (mOnDrawerOffsetListener != null) mOnDrawerOffsetListener.onDrawerOffset(((dragAlpha) * change));
+                offset = dragAlpha;
+                if (mOnDrawerOffsetListener != null) {
+                    mOnDrawerOffsetListener.onDrawerOffset(offset);
+                }
                 if (change == 0) {
                     isScrolling = false;
                     if (mOnDrawerStatusListener != null)
@@ -580,8 +624,9 @@ public class DragViewLayout extends RelativeLayout {
                 if (isAlpha()) {
                     getDragView().setAlpha(dragAlpha);
                 }
+                offset = dragAlpha;
                 if (mOnDrawerOffsetListener != null)
-                    mOnDrawerOffsetListener.onDrawerOffset(dragAlpha);
+                    mOnDrawerOffsetListener.onDrawerOffset(offset);
 
             }
 
