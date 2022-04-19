@@ -4,7 +4,6 @@
     <style name="FrameTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:fitsSystemWindows">false</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowFullscreen">true</item>
     </style>
 
     <style name="DragViewTheme">
