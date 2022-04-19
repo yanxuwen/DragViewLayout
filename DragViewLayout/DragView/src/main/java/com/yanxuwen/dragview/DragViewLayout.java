@@ -208,69 +208,10 @@ public class DragViewLayout extends RelativeLayout {
     public void close() {
         getCurView();
         closing = true;
-        //缩放到关闭的Scale
-        if (getDragView().getHeight() != 0) {
-            closeScaleY = (float) closeHeight / getDragView().getHeight();
-        }
-        if (getDragView().getWidth() != 0) {
-            closeScaleX = (float) closeWidth / getDragView().getWidth();
-        }
-        ObjectAnimator translationX = ObjectAnimator.ofFloat(getDragView(), "translationX", 0, closeLeft - getDragView().getLeft());
-        ObjectAnimator translationY = ObjectAnimator.ofFloat(getDragView(), "translationY", 0, closeTop - getDragView().getTop());
-        //创建透明度动画
-        ObjectAnimator alpha = ObjectAnimator.ofFloat(isCurView ? null : getBgView(), "alpha", 1f, 0f);
-        ObjectAnimator scaleX = ObjectAnimator.ofFloat(getDragView(), "scaleX", 1, closeScaleX);
-        ObjectAnimator scaleY = ObjectAnimator.ofFloat(getDragView(), "scaleY", 1, closeScaleY);
-        //设置控件缩放中心为控件左上角0，0
-        getDragView().setPivotX(0);
-        getDragView().setPivotY(0);
-        //动画集合
-        final AnimatorSet set = new AnimatorSet();
-        //添加动画
-        if (isCurView) {
-            set.play(translationX).with(translationY).with(scaleX).with(scaleY).with(alpha);
-        } else {
-            set.play(alpha);
-        }
-        //由于集合无法监听变化过程，所以使用alpha 来监听,因为alpha值刚好符合  1-0，可以做偏移量
-        alpha.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                offset = (float) valueAnimator.getAnimatedValue();
-                if (mOnDrawerOffsetListener != null) {
-                    mOnDrawerOffsetListener.onDrawerOffset(offset);
-                }
-            }
-        });
-        //设置时间等
-        set.setDuration(300);
-        set.setInterpolator(new AccelerateDecelerateInterpolator());
-        set.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (mOnDrawerStatusListener != null) {
-                    mOnDrawerStatusListener.onStatus(CLOSE);
-                }
-                isScrolling = false;
-                closing = false;
-                if (mOnDrawerStatusListener != null)
-                    mOnDrawerStatusListener.onStatus(CLOSE);
-                set.removeAllListeners();
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-            }
-        });
-        set.start();
+        mDragOffset = 0;
+        dragAlpha = 1;
+        dragScale = 1;
+        minimize();
     }
 
     private void init() {
@@ -587,7 +528,7 @@ public class DragViewLayout extends RelativeLayout {
                 if (isAlpha()) {
                     getDragView().setAlpha(1 - ((1 - dragAlpha) * change));
                 }
-                offset = dragAlpha;
+                offset = (dragAlpha) * change;
                 if (mOnDrawerOffsetListener != null) {
                     mOnDrawerOffsetListener.onDrawerOffset(offset);
                 }

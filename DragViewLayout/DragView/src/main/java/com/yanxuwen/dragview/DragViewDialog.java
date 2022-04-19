@@ -193,6 +193,7 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
         dragViewLayout.setOnDrawerOffsetListener(new DragViewLayout.OnDrawerOffsetListener() {
             @Override
             public void onDrawerOffset(@FloatRange(from = 0, to = 1) float offset) {
+                Log.e("yxw","offset:" + offset);
                 v_bg.setAlpha(offset * 2 - 1);
                 if (mController != null && mController.listener != null) {
                     mController.listener.onDrawerOffset(offset);
@@ -291,6 +292,7 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
 
     @Override
     public void onStatus(int status) {
+        Log.e("yxw","status:" + status);
         this.status = status;
         if (status == DragViewLayout.OPEN) {
             if (mController != null && mController.isTransparentView) {

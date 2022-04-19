@@ -42,8 +42,8 @@ public class TestActivity extends FragmentActivity {
         listfragemnt.add(MyFragment.class);
         listfragemnt.add(MyFragment.class);
 
-        PictureData pictureData1 = new PictureData(R.mipmap.test2, "第一张");
-        PictureData pictureData2 = new PictureData(R.mipmap.test2, "第二张");
+        PictureData pictureData1 = new PictureData(R.mipmap.test, "第一张");
+        PictureData pictureData2 = new PictureData(R.mipmap.test, "第二张");
 
         listdata.add(pictureData1);
         listdata.add(pictureData2);
