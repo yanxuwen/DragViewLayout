@@ -192,15 +192,11 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
         dragViewLayout.setOnDrawerStatusListener(this);
         dragViewLayout.setOnCurViewListener(this);
         dragViewLayout.setOnDrawerOffsetListener(new DragViewLayout.OnDrawerOffsetListener() {
-            BigDecimal bigDecimal;
-
             @Override
             public void onDrawerOffset(@FloatRange(from = 0, to = 1) float offset) {
-                bigDecimal = new BigDecimal(offset);
-                bigDecimal = bigDecimal.setScale(6, BigDecimal.ROUND_HALF_DOWN);
-                v_bg.setAlpha(bigDecimal.floatValue() * 2 - 1);
+                v_bg.setAlpha(offset * 2 - 1);
                 if (mController != null && mController.listener != null) {
-                    mController.listener.onDrawerOffset(bigDecimal.floatValue());
+                    mController.listener.onDrawerOffset(offset);
                 }
             }
         });
