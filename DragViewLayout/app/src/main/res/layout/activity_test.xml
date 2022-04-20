@@ -9,29 +9,47 @@
     >
 
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:id="@+id/layout1"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="right"
+        android:background="@color/colorAccent">
+
+        <ImageView
+            android:id="@+id/image1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
 
         <TextView
             android:id="@+id/text"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_alignParentRight="true"
-            android:background="@color/colorAccent"
-            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:text="ViewPage"
-            android:textColor="#000"
+            android:textColor="#fff"
             android:textSize="16sp" />
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/text2"
+    <RelativeLayout
+        android:id="@+id/layout2"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:layout_marginTop="20dp"
-        android:background="@color/colorAccent"
-        android:gravity="center"
-        android:text="ViewPage2"
-        android:textColor="#000"
-        android:textSize="16sp" />
+        android:background="@color/colorAccent">
+
+        <ImageView
+            android:id="@+id/image2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/text2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="ViewPage2"
+            android:textColor="#000"
+            android:textSize="16sp" />
+    </RelativeLayout>
 </LinearLayout>

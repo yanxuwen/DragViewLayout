@@ -21,6 +21,7 @@ import com.github.chrisbanes.photoview.PhotoView;
 import com.yanxuwen.dragview.AllowDragListener;
 import com.yanxuwen.dragview.DrawData;
 import com.yanxuwen.dragviewlayout.R;
+import com.yanxuwen.dragviewlayout.Test3.PictureData;
 
 /**
  * Created by yanxuwen on 2018/6/15.
@@ -30,7 +31,7 @@ public class MyFragment extends Fragment implements AllowDragListener {
     View parent;
     TextView text;
     private int position;
-    private String data;
+    private PictureData data;
     private PhotoView photoView;
     private SubsamplingScaleImageView longImageView;
     private boolean eqLongImage;
@@ -67,13 +68,13 @@ public class MyFragment extends Fragment implements AllowDragListener {
         text = parent.findViewById(R.id.text);
         photoView = parent.findViewById(R.id.photoView);
         longImageView = parent.findViewById(R.id.imageView);
-        DrawData<String> drawData = new DrawData(getArguments());
+        DrawData<PictureData> drawData = new DrawData(getArguments());
         position = drawData.getPosition();
         data = drawData.getData();
-        text.setText(position + "____" + data);
+        text.setText(position + "____" + data.getName());
         Glide.with(getContext())
                 .asBitmap()
-                .load(R.mipmap.ic_launcher)
+                .load(data.getIdRes())
                 .into(new ImageViewTarget<Bitmap>(photoView) {
                     @Override
                     protected void setResource(@Nullable Bitmap resource) {
