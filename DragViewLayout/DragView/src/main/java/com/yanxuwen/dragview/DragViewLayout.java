@@ -28,9 +28,11 @@ import com.github.chrisbanes.photoview.PhotoView;
  * Created by Flavien Laurent (flavienlaurent.com) on 23/08/13.
  */
 public class DragViewLayout extends RelativeLayout {
-    public static final int OPEN = 0;
-    public static final int CLOSE = 1;
-    public static final int DRAG = 2;
+    public static final int OPENING = 0;
+    public static final int OPEN = 1;
+    public static final int CLOSEING = 2;
+    public static final int CLOSE = 3;
+    public static final int DRAG = 4;
 
     /**
      * 当前要关闭的View的的监听，由于启动的view不受控制，所以位置会随时发生变化，所以要实时监听
@@ -206,12 +208,55 @@ public class DragViewLayout extends RelativeLayout {
     }
 
     public void close() {
-        getCurView();
         closing = true;
         mDragOffset = 0;
         dragAlpha = 1;
         dragScale = 1;
-        minimize();
+        if (mOnDrawerStatusListener != null) {
+            mOnDrawerStatusListener.onStatus(CLOSEING);
+        }
+        if (isCurView) {
+            minimize();
+        } else {
+            final ObjectAnimator alpha = ObjectAnimator.ofFloat(getBgView(), "alpha", 1f, 0f);
+            final ValueAnimator.AnimatorUpdateListener updateListener;
+            alpha.addUpdateListener(updateListener = new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    offset = (float) valueAnimator.getAnimatedValue();
+                    if (mOnDrawerOffsetListener != null) {
+                        mOnDrawerOffsetListener.onDrawerOffset(offset);
+                    }
+                }
+            });
+            alpha.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    if (mOnDrawerStatusListener != null) {
+                        mOnDrawerStatusListener.onStatus(CLOSE);
+                    }
+                    closing = false;
+                    staring = false;
+                    alpha.removeAllListeners();
+                    alpha.removeUpdateListener(updateListener);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+                }
+            });
+            alpha.setDuration(300);
+            alpha.setInterpolator(new AccelerateDecelerateInterpolator());
+            alpha.start();
+        }
     }
 
     private void init() {
@@ -226,17 +271,17 @@ public class DragViewLayout extends RelativeLayout {
         if (mParent instanceof ViewPager || mParent instanceof ViewPager2) {
             mParent = this;
         }
+        setCurView(mImageBean);
         mDragHelper = ViewDragHelper.create(mParent, 1.0f, new ViewDragCallback());
-        mDragHelper.setDuration(500);
+        if (!isCurView) {
+            mDragHelper.setDuration(1000);
+        } else {
+            mDragHelper.setDuration(500);
+        }
         setVisibility(VISIBLE);
         firstTop = getDragView().getTop();
         firstLeft = getDragView().getLeft();
-        setCurView(null);
-        if (!first) return;
-        first = false;
-        setCurView(mImageBean);
-        staring = true;
-//        //缩放到关闭的Scale
+        //缩放到关闭的Scale
         clipVertical = ((float) getDragView().getHeight() / getDragView().getWidth()) > ((float) closeHeight / closeWidth);
         if (clipVertical) {
             if (getDragView().getHeight() != 0) {
@@ -263,11 +308,14 @@ public class DragViewLayout extends RelativeLayout {
                 closeLeft = (int) (closeLeft - (clipLeft * closeScaleX));
             }
         }
-
+        if (!first) return;
+        first = false;
+        staring = true;
+//
         ObjectAnimator translationX = ObjectAnimator.ofFloat(getDragView(), "translationX", closeLeft - getDragView().getLeft(), 0);
         ObjectAnimator translationY = ObjectAnimator.ofFloat(getDragView(), "translationY", closeTop - getDragView().getTop(), 0);
         //创建透明度动画
-        ObjectAnimator alpha = ObjectAnimator.ofFloat(isCurView ? null : getBgView(), "alpha", 0f, 1f);
+        final ObjectAnimator alpha = ObjectAnimator.ofFloat(isCurView ? null : getBgView(), "alpha", 0f, 1f);
         ObjectAnimator scaleX = ObjectAnimator.ofFloat(getDragView(), "scaleX", closeScaleX, 1);
         ObjectAnimator scaleY = ObjectAnimator.ofFloat(getDragView(), "scaleY", closeScaleY, 1);
 
@@ -279,8 +327,9 @@ public class DragViewLayout extends RelativeLayout {
         } else {
             set.play(alpha);
         }
+        final ValueAnimator.AnimatorUpdateListener updateListener;
         //由于集合无法监听变化过程，所以使用alpha 来监听,因为alpha值刚好符合  0-1，可以做偏移量
-        alpha.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        alpha.addUpdateListener(updateListener = new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 offset = (float) valueAnimator.getAnimatedValue();
@@ -292,10 +341,12 @@ public class DragViewLayout extends RelativeLayout {
         //设置时间等
         set.setDuration(300);
         set.setInterpolator(new AccelerateDecelerateInterpolator());
-        set.start();
         set.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
+                if (mOnDrawerStatusListener != null) {
+                    mOnDrawerStatusListener.onStatus(OPENING);
+                }
             }
 
             @Override
@@ -305,6 +356,7 @@ public class DragViewLayout extends RelativeLayout {
                 }
                 staring = false;
                 set.removeAllListeners();
+                alpha.removeUpdateListener(updateListener);
             }
 
             @Override
@@ -315,7 +367,7 @@ public class DragViewLayout extends RelativeLayout {
             public void onAnimationRepeat(Animator animation) {
             }
         });
-
+        set.start();
 
     }
 
@@ -446,7 +498,6 @@ public class DragViewLayout extends RelativeLayout {
 
         @Override
         public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
-            getCurView();
             /**没有指定位置，则不进行缩放***/
             if (!isCurView) {
                 //变化0->1

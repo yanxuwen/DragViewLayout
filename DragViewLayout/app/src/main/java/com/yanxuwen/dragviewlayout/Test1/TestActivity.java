@@ -75,6 +75,12 @@ public class TestActivity extends FragmentActivity {
                     public View getCurView(int position, PictureData data) {
                         return views.get(position);
                     }
+
+                    @Override
+                    public void onDragStatus(int status) {
+                        super.onDragStatus(status);
+                        Log.e("yxw","status: " + status);
+                    }
                 }).show();
     }
 

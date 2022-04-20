@@ -28,6 +28,7 @@ import com.yanxuwen.dragview.listener.Listener;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -191,12 +192,15 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
         dragViewLayout.setOnDrawerStatusListener(this);
         dragViewLayout.setOnCurViewListener(this);
         dragViewLayout.setOnDrawerOffsetListener(new DragViewLayout.OnDrawerOffsetListener() {
+            BigDecimal bigDecimal;
+
             @Override
             public void onDrawerOffset(@FloatRange(from = 0, to = 1) float offset) {
-                Log.e("yxw","offset:" + offset);
-                v_bg.setAlpha(offset * 2 - 1);
+                bigDecimal = new BigDecimal(offset);
+                bigDecimal = bigDecimal.setScale(6, BigDecimal.ROUND_HALF_DOWN);
+                v_bg.setAlpha(bigDecimal.floatValue() * 2 - 1);
                 if (mController != null && mController.listener != null) {
-                    mController.listener.onDrawerOffset(offset);
+                    mController.listener.onDrawerOffset(bigDecimal.floatValue());
                 }
             }
         });
@@ -244,7 +248,7 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
                 if (keyCode == KeyEvent.KEYCODE_BACK) {
-                    if (status == DragViewLayout.CLOSE) {
+                    if (status == DragViewLayout.CLOSE || status == DragViewLayout.CLOSEING || status == DragViewLayout.OPENING) {
                         return true;
                     }
                     if (mController != null && !mController.mCancelable) {
@@ -292,9 +296,15 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
 
     @Override
     public void onStatus(int status) {
-        Log.e("yxw","status:" + status);
         this.status = status;
         if (status == DragViewLayout.OPEN) {
+            if (mController != null && mController.isTransparentView) {
+                //隐藏透明View
+                if (getCurView() != null) {
+                    getCurView().setVisibility(View.VISIBLE);
+                }
+            }
+        } else if (status == DragViewLayout.CLOSEING || status == DragViewLayout.DRAG) {
             if (mController != null && mController.isTransparentView) {
                 //隐藏透明View
                 if (getCurView() != null) {

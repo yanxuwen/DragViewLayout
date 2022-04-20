@@ -85,7 +85,6 @@ public class TestActivity2 extends FragmentActivity {
                     @Override
                     public void onDrawerOffset(@FloatRange(from = 0, to = 1) float offset) {
                         super.onDrawerOffset(offset);
-                        Log.e("yxw", "offset:" + offset);
                         if (text_abstract != null) {
                             text_abstract.setAlpha(offset - 0.3f);
                         }
