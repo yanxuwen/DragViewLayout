@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -29,6 +30,7 @@ public class TestActivity extends FragmentActivity {
     final List<View> views = new ArrayList<>();
     final List<PictureData> listdata = new ArrayList<>();
     final List<Class<? extends Fragment>> listfragemnt = new ArrayList<>();
+    DragViewDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +67,9 @@ public class TestActivity extends FragmentActivity {
 
     }
 
+
     public void open(int position) {
-        final DragViewDialog dialog = new DragViewDialog.Builder(this)
+        dialog = new DragViewDialog.Builder(this)
                 .setData(listdata, listfragemnt)
                 .setViewPage2(position == 1 ? true : false)
                 .setDefaultPosition(position)
@@ -79,7 +82,12 @@ public class TestActivity extends FragmentActivity {
                     @Override
                     public void onDragStatus(int status) {
                         super.onDragStatus(status);
-                        Log.e("yxw","status: " + status);
+                        Log.e("yxw", "status: " + status);
+                    }
+
+                    @Override
+                    public void onPageSelected(final int position) {
+                        super.onPageSelected(position);
                     }
                 }).show();
     }

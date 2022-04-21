@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -46,6 +47,7 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
     private boolean isViewPage2;//是否使用ViewPage2
     protected Controller mController;
     public int status;
+    private Handler handler = new Handler();
 
     public DragViewDialog(Controller mController) {
         this.mController = mController;
@@ -226,12 +228,7 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
                     DragViewDialog.this.onPageScrollStateChanged(state);
                 }
             });
-            viewPager2.post(new Runnable() {
-                @Override
-                public void run() {
-                    viewPager2.setCurrentItem(currentPosition, false);
-                }
-            });
+            viewPager2.setCurrentItem(currentPosition, false);
         } else {
             setDragView(viewPager);
             mMPagerAdapter = new DragStatePagerAdapter(getChildFragmentManager(), mController.fragmentClassList, mController.listData);
@@ -344,6 +341,7 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
         if (viewPager2 != null) {
             viewPager2.unregisterOnPageChangeCallback(pageChangeCallback2);
         }
+        handler.removeCallbacksAndMessages(null);
         dragViewLayout.removeOnDrawerStatusListener();
         dragViewLayout.removeOnCurViewListener();
         dragViewLayout.removeOnDrawerOffsetListener();
@@ -364,7 +362,12 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
     public void onPageSelected(final int position) {
         currentPosition = position;
         if (mController.listener != null) {
-            mController.listener.onPageSelected(position);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mController.listener.onPageSelected(position);
+                }
+            });
         }
     }
 
@@ -447,6 +450,20 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
             super.dismiss();
         }
 
+    }
+
+    public void remove(int position) {
+        if (mController != null && mController.listData.size() == 1) {
+            //如果最后一个了，则直接关闭就行
+            dragViewLayout.setCurView(null);
+            dismiss();
+            return;
+        }
+        if (mMPagerAdapter2 != null) {
+            mMPagerAdapter2.remove(position);
+        } else if (mMPagerAdapter != null) {
+            mMPagerAdapter.remove(position);
+        }
     }
 
     @Override

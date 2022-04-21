@@ -12,8 +12,10 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author bsnl_yanxuwen
@@ -23,7 +25,7 @@ import java.util.List;
  */
 public class DragStatePagerAdapter2 extends FragmentStateAdapter {
     public List<? extends Serializable> listData;
-    private List<Fragment> fragmentList = new ArrayList<>();
+    private Map<Long, Fragment> fragmentMap = new HashMap();
     public List<Class<? extends Fragment>> fragmentClassList;
     private List<Long> fragmentIds = new ArrayList<>();//用于存储更新fragment的特定标识
     private HashSet<Long> creatIds = new HashSet<>();//得用hashset防重，用于存储adapter内的顺序
@@ -73,60 +75,33 @@ public class DragStatePagerAdapter2 extends FragmentStateAdapter {
         Long ids = fragmentIds.get(position);
         creatIds.add(ids);//创建的时候将未添加的fragment添加进来，每次刷新都会调用这里，其次调用containsItem
 
-        if (fragmentList != null && fragmentList.size() > position && fragmentList.get(position) != null) {
-            return fragmentList.get(position);
+        if (fragmentMap != null && fragmentMap.containsKey(ids)) {
+            return fragmentMap.get(ids);
         }
         try {
-            if (fragmentList.size() == position) {
-                Fragment fragment = (Fragment) (fragmentClassList.get(position)).newInstance();
-                Bundle b = new Bundle();
-                b.putInt("position", position);
-                b.putSerializable("data", (Serializable) listData.get(position));
-                fragment.setArguments(b);
-                fragmentList.add(fragment);
-                return fragmentList.get(position);
-
-            } else if (fragmentList.size() > position) {
-
-                if (fragmentList.get(position) == null) {
-                    fragmentList.set(position, (Fragment) (fragmentClassList.get(position)).newInstance());
-                    Bundle b = new Bundle();
-                    b.putInt("position", position);
-                    b.putSerializable("data", (Serializable) listData.get(position));
-                    fragmentList.get(position).setArguments(b);
-                }
-                return fragmentList.get(position);
-            } else {
-                for (int i = fragmentList.size(); i < position; i++) {
-                    fragmentList.add(null);
-                }
-                Fragment fragment = (Fragment) (fragmentClassList.get(position)).newInstance();
-                Bundle b = new Bundle();
-                b.putInt("position", position);
-                b.putSerializable("data", (Serializable) listData.get(position));
-                fragment.setArguments(b);
-                fragmentList.add(fragment);
-                return fragmentList.get(position);
-            }
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            Fragment fragment = (Fragment) (fragmentClassList.get(position)).newInstance();
+            Bundle b = new Bundle();
+            b.putInt("position", position);
+            b.putSerializable("data", (Serializable) listData.get(position));
+            fragment.setArguments(b);
+            fragmentMap.put(ids, fragment);
+            return fragment;
+        } catch (Exception e) {
+            return null;
         }
-
-        return null;
     }
 
     public Fragment getItem(int position) {
-        if (fragmentList != null && fragmentList.size() > position && fragmentList.get(position) != null) {
-            return fragmentList.get(position);
+        Long ids = fragmentIds.get(position);
+        if (fragmentMap != null && fragmentMap.containsKey(ids)) {
+            return fragmentMap.get(ids);
         }
         return null;
     }
 
     @Override
     public int getItemCount() {
-        return fragmentClassList.size();
+        return listData.size();
     }
 
     /**
@@ -137,7 +112,10 @@ public class DragStatePagerAdapter2 extends FragmentStateAdapter {
      */
     @Override
     public long getItemId(int position) {
-        return fragmentIds.get(position);
+        if (fragmentIds.size() > position) {
+            return fragmentIds.get(position);
+        }
+        return -1;
     }
 
     @Override
@@ -147,7 +125,6 @@ public class DragStatePagerAdapter2 extends FragmentStateAdapter {
 
 
     public void update() {
-        updateIds(listData);
         notifyDataSetChanged();
     }
 
@@ -155,7 +132,17 @@ public class DragStatePagerAdapter2 extends FragmentStateAdapter {
     public void updateIds(List<? extends Serializable> listData) {
         fragmentIds.clear();
         for (int i = 0; i < listData.size(); i++) {
-            fragmentIds.add(Long.parseLong(i + ""));
+            fragmentIds.add(System.currentTimeMillis() + i);
         }
+    }
+
+
+    public void remove(int position) {
+        Long ids = fragmentIds.get(position);
+        fragmentMap.remove(ids);
+        listData.remove(position);
+        fragmentClassList.remove(position);
+        fragmentIds.remove(position);
+        update();
     }
 }
