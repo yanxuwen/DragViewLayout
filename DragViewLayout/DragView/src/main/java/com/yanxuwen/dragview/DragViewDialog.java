@@ -200,6 +200,9 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
                 }
             }
         });
+        if (mController.listener != null) {
+            mController.listener.init();
+        }
         if (isViewPage2) {
             setDragView(viewPager2);
             mMPagerAdapter2 = new DragStatePagerAdapter2(getChildFragmentManager(), mController.fragmentClassList, mController.listData);
@@ -233,10 +236,6 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
             if (currentPosition == 0) {
                 onPageSelected(currentPosition);
             }
-        }
-
-        if (mController.listener != null) {
-            mController.listener.init();
         }
         //该功能失效了
 //        getDialog().setOnDismissListener(mController.mOnDismissListener);
