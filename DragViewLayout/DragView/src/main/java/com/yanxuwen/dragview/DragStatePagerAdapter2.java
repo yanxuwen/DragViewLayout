@@ -123,12 +123,6 @@ public class DragStatePagerAdapter2 extends FragmentStateAdapter {
         return creatIds.contains(itemId);
     }
 
-
-    public void update() {
-        notifyDataSetChanged();
-    }
-
-
     public void updateIds(List<? extends Serializable> listData) {
         fragmentIds.clear();
         for (int i = 0; i < listData.size(); i++) {
@@ -143,6 +137,6 @@ public class DragStatePagerAdapter2 extends FragmentStateAdapter {
         listData.remove(position);
         fragmentClassList.remove(position);
         fragmentIds.remove(position);
-        update();
+        notifyDataSetChanged();
     }
 }

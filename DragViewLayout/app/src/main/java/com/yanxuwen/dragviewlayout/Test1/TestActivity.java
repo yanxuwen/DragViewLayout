@@ -88,6 +88,8 @@ public class TestActivity extends FragmentActivity {
                     @Override
                     public void onPageSelected(final int position) {
                         super.onPageSelected(position);
+                        Log.e("yxw", "onPageSelected: " + position);
+
                     }
                 }).show();
     }

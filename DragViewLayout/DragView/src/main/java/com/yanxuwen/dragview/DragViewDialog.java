@@ -431,14 +431,6 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
         ft.commitAllowingStateLoss();
     }
 
-    public void notifyDataSetChanged() {
-        if (isViewPage2) {
-            mMPagerAdapter2.update();
-        } else {
-            mMPagerAdapter.notifyDataSetChanged();
-        }
-    }
-
     @Override
     public void dismiss() {
         if (getDialog() == null || !getDialog().isShowing()) {
@@ -450,6 +442,16 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
             super.dismiss();
         }
 
+    }
+
+
+
+    public void notifyDataSetChanged() {
+        if (isViewPage2) {
+            mMPagerAdapter2.notifyDataSetChanged();
+        } else {
+            mMPagerAdapter.notifyDataSetChanged();
+        }
     }
 
     public void remove(int position) {
@@ -464,6 +466,8 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
         } else if (mMPagerAdapter != null) {
             mMPagerAdapter.remove(position);
         }
+        //删除完成后，需要调用下onPageSelected
+        onPageSelected(currentPosition);
     }
 
     @Override
