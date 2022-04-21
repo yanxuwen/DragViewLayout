@@ -76,10 +76,7 @@ public class TestActivity2 extends FragmentActivity {
                             listfragemnt.add(MyFragment2.class);
                             dialog.notifyDataSetChanged();
                         }
-                        if (text_abstract != null) {
-                            text_abstract.setText((position + 1) + "/" + 3 + " 照片XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-                        }
-
+                        text_abstract.setText((position + 1) + "/" + 3 + " 照片XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
                     }
 
                     @Override

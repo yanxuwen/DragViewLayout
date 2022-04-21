@@ -226,7 +226,12 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
                     DragViewDialog.this.onPageScrollStateChanged(state);
                 }
             });
-            viewPager2.setCurrentItem(currentPosition, false);
+            viewPager2.post(new Runnable() {
+                @Override
+                public void run() {
+                    viewPager2.setCurrentItem(currentPosition, false);
+                }
+            });
         } else {
             setDragView(viewPager);
             mMPagerAdapter = new DragStatePagerAdapter(getChildFragmentManager(), mController.fragmentClassList, mController.listData);
@@ -234,7 +239,12 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
             viewPager.addOnPageChangeListener(this);
             viewPager.setCurrentItem(currentPosition, false);
             if (currentPosition == 0) {
-                onPageSelected(currentPosition);
+                viewPager.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        onPageSelected(currentPosition);
+                    }
+                });
             }
         }
         //该功能失效了
