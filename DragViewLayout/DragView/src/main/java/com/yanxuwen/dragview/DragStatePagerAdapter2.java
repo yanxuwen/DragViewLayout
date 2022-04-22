@@ -76,7 +76,12 @@ public class DragStatePagerAdapter2 extends FragmentStateAdapter {
         creatIds.add(ids);//创建的时候将未添加的fragment添加进来，每次刷新都会调用这里，其次调用containsItem
 
         if (fragmentMap != null && fragmentMap.containsKey(ids)) {
-            return fragmentMap.get(ids);
+            Fragment fragment = fragmentMap.get(ids);
+            Bundle b = new Bundle();
+            b.putInt("position", position);
+            b.putSerializable("data", (Serializable) listData.get(position));
+            fragment.setArguments(b);
+            return fragment;
         }
         try {
             Fragment fragment = (Fragment) (fragmentClassList.get(position)).newInstance();

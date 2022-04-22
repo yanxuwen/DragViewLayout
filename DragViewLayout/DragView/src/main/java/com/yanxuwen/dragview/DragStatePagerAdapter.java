@@ -41,7 +41,12 @@ public class DragStatePagerAdapter extends FragmentStatePagerAdapter {
         Long ids = fragmentIds.get(position);
 
         if (fragmentMap != null && fragmentMap.containsKey(ids)) {
-            return fragmentMap.get(ids);
+            Fragment fragment = fragmentMap.get(ids);
+            Bundle b = new Bundle();
+            b.putInt("position", position);
+            b.putSerializable("data", (Serializable) listData.get(position));
+            fragment.setArguments(b);
+            return fragment;
         }
         try {
             Fragment fragment = (Fragment) (fragmentClassList.get(position)).newInstance();

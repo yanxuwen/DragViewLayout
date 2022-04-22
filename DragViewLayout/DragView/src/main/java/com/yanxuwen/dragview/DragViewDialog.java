@@ -445,7 +445,6 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
     }
 
 
-
     public void notifyDataSetChanged() {
         if (isViewPage2) {
             mMPagerAdapter2.notifyDataSetChanged();
@@ -461,13 +460,26 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
             dismiss();
             return;
         }
+        boolean isCur = position == currentPosition;
         if (mMPagerAdapter2 != null) {
             mMPagerAdapter2.remove(position);
         } else if (mMPagerAdapter != null) {
             mMPagerAdapter.remove(position);
         }
-        //删除完成后，需要调用下onPageSelected
-        onPageSelected(currentPosition);
+        if (isCur) {
+            //删除当前的，需要调用onPageSelected
+            getParent().post(new Runnable() {
+                @Override
+                public void run() {
+                    if (viewPager != null) {
+                        onPageSelected(viewPager.getCurrentItem());
+                    } else if (viewPager2 != null) {
+                        onPageSelected(viewPager2.getCurrentItem());
+                    }
+                }
+            });
+        }
+
     }
 
     @Override

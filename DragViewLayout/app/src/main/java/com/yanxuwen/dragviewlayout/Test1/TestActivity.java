@@ -41,14 +41,18 @@ public class TestActivity extends FragmentActivity {
         layout2 = findViewById(R.id.layout2);
         views.add(layout1);
         views.add(layout2);
+        views.add(layout2);
+        listfragemnt.add(MyFragment.class);
         listfragemnt.add(MyFragment.class);
         listfragemnt.add(MyFragment.class);
 
         PictureData pictureData1 = new PictureData(R.mipmap.test, "第一张");
         PictureData pictureData2 = new PictureData(R.mipmap.test, "第二张");
+        PictureData pictureData3 = new PictureData(R.mipmap.test, "第三张");
 
         listdata.add(pictureData1);
         listdata.add(pictureData2);
+        listdata.add(pictureData3);
         layout1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,7 +86,7 @@ public class TestActivity extends FragmentActivity {
                     @Override
                     public void onDragStatus(int status) {
                         super.onDragStatus(status);
-                        Log.e("yxw", "status: " + status);
+//                        Log.e("yxw", "status: " + status);
                     }
 
                     @Override
