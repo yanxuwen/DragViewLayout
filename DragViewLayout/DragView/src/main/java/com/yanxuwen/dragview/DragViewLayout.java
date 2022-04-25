@@ -559,8 +559,8 @@ public class DragViewLayout extends RelativeLayout {
                 float newscaleX = diffscaleX * change + closeScaleX;
                 float newscaleY = diffscaleY * change + closeScaleY;
 
-                getDragView().setPivotX((getDragView().getWidth() * change) / 2);
-                getDragView().setPivotY((getDragView().getHeight() * change) / 2);
+                getDragView().setPivotX(0);
+                getDragView().setPivotY(0);
                 try {
                     getDragView().setScaleX(newscaleX);
                     getDragView().setScaleY(newscaleY);
