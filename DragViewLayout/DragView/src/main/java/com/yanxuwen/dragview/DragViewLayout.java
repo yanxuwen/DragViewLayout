@@ -275,9 +275,9 @@ public class DragViewLayout extends RelativeLayout {
         setCurView(mImageBean);
         mDragHelper = ViewDragHelper.create(mParent, 1.0f, new ViewDragCallback());
         if (!isCurView) {
-            mDragHelper.setDuration(1000);
+            mDragHelper.setDuration(800);
         } else {
-            mDragHelper.setDuration(500);
+            mDragHelper.setDuration(350);
         }
         setVisibility(VISIBLE);
         firstTop = getDragView().getTop();
@@ -341,7 +341,7 @@ public class DragViewLayout extends RelativeLayout {
             }
         });
         //设置时间等
-        set.setDuration(200);
+        set.setDuration(250);
         set.setInterpolator(new AccelerateDecelerateInterpolator());
         set.addListener(new Animator.AnimatorListener() {
             @Override
