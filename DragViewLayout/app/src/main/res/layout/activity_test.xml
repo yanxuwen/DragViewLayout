@@ -12,6 +12,7 @@
         android:id="@+id/layout1"
         android:layout_width="200dp"
         android:layout_height="200dp"
+        android:layout_marginTop="0dp"
         android:background="@color/colorAccent">
 
         <ImageView

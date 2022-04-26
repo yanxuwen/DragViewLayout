@@ -313,7 +313,7 @@ public class DragViewLayout extends RelativeLayout {
         if (!first) return;
         first = false;
         staring = true;
-//
+        //todo 后续需要废弃，不使用动画
         ObjectAnimator translationX = ObjectAnimator.ofFloat(getDragView(), "translationX", startLeft, 0);
         ObjectAnimator translationY = ObjectAnimator.ofFloat(getDragView(), "translationY", startTop, 0);
         //创建透明度动画
@@ -341,7 +341,7 @@ public class DragViewLayout extends RelativeLayout {
             }
         });
         //设置时间等
-        set.setDuration(300);
+        set.setDuration(200);
         set.setInterpolator(new AccelerateDecelerateInterpolator());
         set.addListener(new Animator.AnimatorListener() {
             @Override
@@ -386,10 +386,10 @@ public class DragViewLayout extends RelativeLayout {
             closeBottom = 0;
         } else {
             isCurView = true;
-            //关闭需要用到，全屏的top,因为当前界面是全屏
-            closeTop = mImageBean.screen_top;
-            closeLeft = mImageBean.screen_left;
-            //启动不需要用到全屏top,因为我们不清楚上一个界面是不是全屏的
+            //关闭top
+            closeTop = mImageBean.top;
+            closeLeft = mImageBean.left;
+            //启动top
             startTop = mImageBean.top;
             startLeft = mImageBean.left;
             closeHeight = mImageBean.height;
@@ -859,8 +859,6 @@ public class DragViewLayout extends RelativeLayout {
     }
 
     public static class ImageBean implements Parcelable {
-        int screen_top;//全屏top
-        int screen_left;
         int top;
         int left;
         int width;
@@ -873,8 +871,6 @@ public class DragViewLayout extends RelativeLayout {
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
-            dest.writeInt(this.screen_left);
-            dest.writeInt(this.screen_top);
             dest.writeInt(this.left);
             dest.writeInt(this.top);
             dest.writeInt(this.left);
@@ -886,8 +882,6 @@ public class DragViewLayout extends RelativeLayout {
         }
 
         private ImageBean(Parcel in) {
-            this.screen_left = in.readInt();
-            this.screen_top = in.readInt();
             this.top = in.readInt();
             this.left = in.readInt();
             this.width = in.readInt();

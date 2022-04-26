@@ -2,6 +2,7 @@ package com.yanxuwen.dragview;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -273,15 +274,21 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
         DragViewLayout.ImageBean imageBean = new DragViewLayout.ImageBean();
         int location[] = new int[2];
         view.getLocationOnScreen(location);
-        int location2[] = new int[2];
-        view.getLocationInWindow(location);
-        imageBean.screen_left = location[0];
-        imageBean.screen_top = location[1];
-        imageBean.left = location2[0];
-        imageBean.top = location2[1];
+        imageBean.left = location[0];
+        imageBean.top = location[1];
         imageBean.width = view.getWidth();
         imageBean.height = view.getHeight();
         return imageBean;
+    }
+
+    /**
+     * 将dip或dp值转换为px值，保证尺寸大小不变
+     * @param dipValue
+     * @return
+     */
+    public static int dip2px(float dipValue) {
+        float density = Resources.getSystem().getDisplayMetrics().density;
+        return (int) (dipValue * density + 0.5f);
     }
 
     @Override

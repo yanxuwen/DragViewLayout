@@ -25,6 +25,7 @@ import java.util.List;
 
 public class TestActivity extends FragmentActivity {
     public ImageView image1;
+    public ImageView image2;
     public View layout1;
     public View layout2;
     final List<View> views = new ArrayList<>();
@@ -39,9 +40,10 @@ public class TestActivity extends FragmentActivity {
         layout1 = findViewById(R.id.layout1);
         image1 = findViewById(R.id.image1);
         layout2 = findViewById(R.id.layout2);
-        views.add(layout1);
-        views.add(layout2);
-        views.add(layout2);
+        image2 = findViewById(R.id.image2);
+        views.add(image1);
+        views.add(image2);
+        views.add(image2);
         listfragemnt.add(MyFragment.class);
         listfragemnt.add(MyFragment.class);
         listfragemnt.add(MyFragment.class);
