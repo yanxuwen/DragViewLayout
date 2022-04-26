@@ -9,7 +9,6 @@ import android.graphics.Rect;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -569,7 +568,9 @@ public class DragViewLayout extends RelativeLayout {
                 float newscaleY = diffscaleY * change + closeScaleY;
 
 
-                getDragView().setPivotX((getDragView().getWidth() * change) / 2);
+//                getDragView().setPivotX((getDragView().getWidth() / 2) * change);
+                //todo 不使用中间的话，释放的时候，如果此时靠墙，会向右偏移下，没有靠墙，释放偏移正常
+                getDragView().setPivotX(0);
                 getDragView().setPivotY(0);
                 try {
                     getDragView().setScaleX(newscaleX);
@@ -608,7 +609,11 @@ public class DragViewLayout extends RelativeLayout {
                 dragScale = (1 - mDragOffset);
                 if (dragScale > 1) dragScale = 1;
 
-                getDragView().setPivotX((getDragView().getWidth()) / 2);
+//                getDragView().setPivotX((getDragView().getWidth()) / 2);
+                //todo 不使用中间的话，向下拖拽的时候会偏向左边，
+                //没办法，因为释放的时候如果不设置0,没有拖拽直接关闭的话，会直接像右边偏移下，效果更差
+                //目前中和情况下，只能拖拽的时候偏左
+                getDragView().setPivotX(0);
                 getDragView().setPivotY(0);
                 getDragView().setScaleX(dragScale);
                 getDragView().setScaleY(dragScale);
