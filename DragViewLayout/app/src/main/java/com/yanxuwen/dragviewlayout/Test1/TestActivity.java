@@ -92,7 +92,13 @@ public class TestActivity extends FragmentActivity {
                     @Override
                     public void onPageSelected(final int position) {
                         super.onPageSelected(position);
-                        Log.e("yxw", "onPageSelected: " + position);
+
+                    }
+
+                    @Override
+                    public void onDrawerOffset(float offset) {
+                        super.onDrawerOffset(offset);
+                        Log.e("yxw", "offset: " + offset);
 
                     }
                 }).show();

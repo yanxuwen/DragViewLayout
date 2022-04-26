@@ -112,6 +112,8 @@ public class DragViewLayout extends RelativeLayout {
     private int firstLeft;
     private int closeTop;
     private int closeLeft;
+    private int startTop;
+    private int startLeft;
     private int closeRight;
     private int closeBottom;
     private float clipTop;
@@ -281,6 +283,7 @@ public class DragViewLayout extends RelativeLayout {
         setVisibility(VISIBLE);
         firstTop = getDragView().getTop();
         firstLeft = getDragView().getLeft();
+
         //缩放到关闭的Scale
         clipVertical = ((float) getDragView().getHeight() / getDragView().getWidth()) > ((float) closeHeight / closeWidth);
         if (clipVertical) {
@@ -312,8 +315,8 @@ public class DragViewLayout extends RelativeLayout {
         first = false;
         staring = true;
 //
-        ObjectAnimator translationX = ObjectAnimator.ofFloat(getDragView(), "translationX", closeLeft - getDragView().getLeft(), 0);
-        ObjectAnimator translationY = ObjectAnimator.ofFloat(getDragView(), "translationY", closeTop - getDragView().getTop(), 0);
+        ObjectAnimator translationX = ObjectAnimator.ofFloat(getDragView(), "translationX", startLeft, 0);
+        ObjectAnimator translationY = ObjectAnimator.ofFloat(getDragView(), "translationY", startTop, 0);
         //创建透明度动画
         final ObjectAnimator alpha = ObjectAnimator.ofFloat(isCurView ? null : getBgView(), "alpha", 0f, 1f);
         ObjectAnimator scaleX = ObjectAnimator.ofFloat(getDragView(), "scaleX", closeScaleX, 1);
@@ -374,6 +377,8 @@ public class DragViewLayout extends RelativeLayout {
     public void setCurView(ImageBean mImageBean) {
         if (mImageBean == null) {
             isCurView = false;
+            startTop = 0;
+            startLeft = 0;
             closeTop = 0;
             closeLeft = 0;
             closeHeight = 0;
@@ -382,8 +387,12 @@ public class DragViewLayout extends RelativeLayout {
             closeBottom = 0;
         } else {
             isCurView = true;
-            closeTop = mImageBean.top;
-            closeLeft = mImageBean.left;
+            //关闭需要用到，全屏的top,因为当前界面是全屏
+            closeTop = mImageBean.screen_top;
+            closeLeft = mImageBean.screen_left;
+            //启动不需要用到全屏top,因为我们不清楚上一个界面是不是全屏的
+            startTop = mImageBean.top;
+            startLeft = mImageBean.left;
             closeHeight = mImageBean.height;
             closeWidth = mImageBean.width;
             closeRight = closeLeft + closeWidth;
@@ -559,11 +568,13 @@ public class DragViewLayout extends RelativeLayout {
                 float newscaleX = diffscaleX * change + closeScaleX;
                 float newscaleY = diffscaleY * change + closeScaleY;
 
-                getDragView().setPivotX(0);
+
+                getDragView().setPivotX((getDragView().getWidth() * change) / 2);
                 getDragView().setPivotY(0);
                 try {
                     getDragView().setScaleX(newscaleX);
                     getDragView().setScaleY(newscaleY);
+
                 } catch (Exception e) {
                     //有时候会抛出    java.lang.IllegalArgumentException: Cannot set 'scaleX' to Float.NaN
                     //待解
@@ -598,7 +609,7 @@ public class DragViewLayout extends RelativeLayout {
                 if (dragScale > 1) dragScale = 1;
 
                 getDragView().setPivotX((getDragView().getWidth()) / 2);
-                getDragView().setPivotY((getDragView().getHeight()) / 2);
+                getDragView().setPivotY(0);
                 getDragView().setScaleX(dragScale);
                 getDragView().setScaleY(dragScale);
                 if (dragScale < 1) {
@@ -759,6 +770,8 @@ public class DragViewLayout extends RelativeLayout {
         }
         if (isVertical && isAllowDrag()) {
             drag = true;
+        } else {
+            drag = false;
         }
         return drag ? true : false;
 
@@ -841,6 +854,8 @@ public class DragViewLayout extends RelativeLayout {
     }
 
     public static class ImageBean implements Parcelable {
+        int screen_top;//全屏top
+        int screen_left;
         int top;
         int left;
         int width;
@@ -853,6 +868,9 @@ public class DragViewLayout extends RelativeLayout {
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
+            dest.writeInt(this.screen_left);
+            dest.writeInt(this.screen_top);
+            dest.writeInt(this.left);
             dest.writeInt(this.top);
             dest.writeInt(this.left);
             dest.writeInt(this.width);
@@ -863,6 +881,8 @@ public class DragViewLayout extends RelativeLayout {
         }
 
         private ImageBean(Parcel in) {
+            this.screen_left = in.readInt();
+            this.screen_top = in.readInt();
             this.top = in.readInt();
             this.left = in.readInt();
             this.width = in.readInt();
