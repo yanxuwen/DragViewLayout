@@ -268,31 +268,17 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
         dragViewLayout.setDragView(dragview);
     }
 
-    public ArrayList<DragViewLayout.ImageBean> getImageBeans(View[] views) {
-        ArrayList<DragViewLayout.ImageBean> imageBeans = new ArrayList<>();
-        for (View view : views) {
-            DragViewLayout.ImageBean imageBean = new DragViewLayout.ImageBean();
-            int location[] = new int[2];
-            view.getLocationOnScreen(location);
-            imageBean.left = location[0];
-            imageBean.top = location[1];
-            imageBean.width = view.getWidth();
-            imageBean.height = view.getHeight();
-//            imageBeans[i] = imageBean;
-            imageBeans.add(imageBean);
-        }
-        return imageBeans;
-    }
-
     public DragViewLayout.ImageBean getImageBean(View view) {
         if (view == null) return null;
         DragViewLayout.ImageBean imageBean = new DragViewLayout.ImageBean();
         int location[] = new int[2];
         view.getLocationOnScreen(location);
+        int location2[] = new int[2];
+        view.getLocationInWindow(location);
         imageBean.screen_left = location[0];
         imageBean.screen_top = location[1];
-        imageBean.left = view.getLeft();
-        imageBean.top = view.getTop();
+        imageBean.left = location2[0];
+        imageBean.top = location2[1];
         imageBean.width = view.getWidth();
         imageBean.height = view.getHeight();
         return imageBean;
