@@ -50,6 +50,12 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
     public int status;
     private Handler handler = new Handler();
 
+    //Fragment必须有一个无参public的构造函数
+    //不然会抛出Unable to instantiate fragment
+    public DragViewDialog() {
+
+    }
+
     public DragViewDialog(Controller mController) {
         this.mController = mController;
     }
@@ -283,6 +289,7 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
 
     /**
      * 将dip或dp值转换为px值，保证尺寸大小不变
+     *
      * @param dipValue
      * @return
      */
