@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -154,6 +155,19 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
             return this;
         }
 
+
+        /**
+         * 设置状态栏是否是亮色，默认false
+         * 也就是黑色字体
+         *
+         * @param isLightStatusBar
+         * @return
+         */
+        public Builder isLightStatusBar(boolean isLightStatusBar) {
+            this.mController.isLightStatusBar = isLightStatusBar;
+            return this;
+        }
+
         public DragViewDialog create() {
             DragViewDialog dialogFragment = new DragViewDialog(mController);
             return dialogFragment;
@@ -190,6 +204,16 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
     }
 
     private void initView() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            View decorView = getDialog().getWindow().getDecorView();
+            int vis = decorView.getSystemUiVisibility();
+            if (mController.isLightStatusBar) {
+                vis |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            } else {
+                vis &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            }
+            decorView.setSystemUiVisibility(vis);
+        }
         dragViewLayout = parent.findViewById(R.id.dragLayout);
         viewPager = parent.findViewById(R.id.viewPager);
         viewPager2 = parent.findViewById(R.id.viewPager2);
@@ -343,10 +367,14 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
         if (viewPager2 != null) {
             viewPager2.unregisterOnPageChangeCallback(pageChangeCallback2);
         }
-        handler.removeCallbacksAndMessages(null);
-        dragViewLayout.removeOnDrawerStatusListener();
-        dragViewLayout.removeOnCurViewListener();
-        dragViewLayout.removeOnDrawerOffsetListener();
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
+        if (dragViewLayout != null) {
+            dragViewLayout.removeOnDrawerStatusListener();
+            dragViewLayout.removeOnCurViewListener();
+            dragViewLayout.removeOnDrawerOffsetListener();
+        }
         mController = null;
     }
 

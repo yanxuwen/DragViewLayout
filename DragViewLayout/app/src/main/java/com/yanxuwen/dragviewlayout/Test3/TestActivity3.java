@@ -55,6 +55,7 @@ public class TestActivity3 extends FragmentActivity {
                 .setViewPage2(true)
                 .setTransparentView(true)
                 .setBackgroundColor(Color.parseColor("#333333"))
+                .isLightStatusBar(true)
                 .setListener(new Listener<PictureData>() {
                     @Override
                     public View getCurView(int position, PictureData pictureData) {

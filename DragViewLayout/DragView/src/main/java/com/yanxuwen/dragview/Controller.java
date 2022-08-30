@@ -24,4 +24,5 @@ public class Controller {
     public int bgColor;//背景颜色
     public boolean mCancelable = true;
     public DialogInterface.OnDismissListener mOnDismissListener;
+    public Boolean isLightStatusBar = false; //是否是亮色状态栏
 }
