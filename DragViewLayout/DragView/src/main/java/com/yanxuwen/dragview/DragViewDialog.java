@@ -233,7 +233,7 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
                 }
             }
         });
-        if (mController.listener != null) {
+        if (mController != null && mController.listener != null) {
             mController.listener.init();
         }
         if (isViewPage2) {
