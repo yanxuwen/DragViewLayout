@@ -204,10 +204,14 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
     }
 
     private void initView() {
+        if (mController == null) {
+            dismiss();
+            return;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             View decorView = getDialog().getWindow().getDecorView();
             int vis = decorView.getSystemUiVisibility();
-            if (mController.isLightStatusBar) {
+            if (mController != null && mController.isLightStatusBar) {
                 vis |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
             } else {
                 vis &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
