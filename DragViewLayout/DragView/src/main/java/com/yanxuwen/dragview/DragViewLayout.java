@@ -792,6 +792,10 @@ public class DragViewLayout extends RelativeLayout {
                 return ((AllowDragListener) fragment).isAllowDrag();
             }
         } else if (viewPager2 != null) {
+            //竖方向不允许拖拽
+            if (viewPager2.getOrientation() == ViewPager2.ORIENTATION_VERTICAL) {
+                return false;
+            }
             if (viewPagerAdapter2 == null && viewPager2.getAdapter() instanceof DragStatePagerAdapter2) {
                 viewPagerAdapter2 = (DragStatePagerAdapter2) viewPager2.getAdapter();
             }
