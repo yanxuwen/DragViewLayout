@@ -81,6 +81,14 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
         }
 
         /**
+         * 设置滑动方向，目前只支持ViewPage2
+         */
+        public Builder setOrientation(@ViewPager2.Orientation int orientation) {
+            mController.orientation = orientation;
+            return this;
+        }
+
+        /**
          * 建议开启
          * 启动的View是否透明化，
          * 使得效果更好
@@ -244,6 +252,7 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
             setDragView(viewPager2);
             mMPagerAdapter2 = new DragStatePagerAdapter2(getChildFragmentManager(), mController.fragmentClassList, mController.listData);
             viewPager2.setAdapter(mMPagerAdapter2);
+            viewPager2.setOrientation(mController != null ? mController.orientation : ViewPager2.ORIENTATION_HORIZONTAL);
             viewPager2.registerOnPageChangeCallback(pageChangeCallback2 = new ViewPager2.OnPageChangeCallback() {
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
