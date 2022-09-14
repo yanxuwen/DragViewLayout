@@ -525,6 +525,23 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
 
     }
 
+    public void setCurrentItem(int position) {
+        if (viewPager != null) {
+            viewPager.setCurrentItem(position);
+        } else if (viewPager2 != null) {
+            viewPager2.setCurrentItem(position);
+        }
+    }
+
+    public int getCurrentItem() {
+        if (viewPager != null) {
+            return viewPager.getCurrentItem();
+        } else if (viewPager2 != null) {
+            return viewPager2.getCurrentItem();
+        }
+        return 0;
+    }
+
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
