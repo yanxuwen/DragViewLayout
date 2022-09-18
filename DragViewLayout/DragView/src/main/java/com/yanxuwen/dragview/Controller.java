@@ -6,6 +6,7 @@ import android.view.View;
 import androidx.annotation.DrawableRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.yanxuwen.dragview.listener.Listener;
 
@@ -27,4 +28,5 @@ public class Controller {
     public boolean mCancelable = true;
     public DialogInterface.OnDismissListener mOnDismissListener;
     public Boolean isLightStatusBar = false; //是否是亮色状态栏
+    public int offscreenPageLimit;
 }

@@ -105,6 +105,15 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
         }
 
         /**
+         * 预加载
+         */
+        public Builder setOffscreenPageLimit(int offscreenPageLimit) {
+            mController.offscreenPageLimit = offscreenPageLimit;
+            return this;
+        }
+
+
+        /**
          * 设置数据，必须设置（多个数据）
          *
          * @param listData          数据列表 不能为空
@@ -252,6 +261,9 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
             setDragView(viewPager2);
             mMPagerAdapter2 = new DragStatePagerAdapter2(getChildFragmentManager(), mController.fragmentClassList, mController.listData);
             viewPager2.setAdapter(mMPagerAdapter2);
+            if (mController != null) {
+                viewPager2.setOffscreenPageLimit(mController.offscreenPageLimit);
+            }
             viewPager2.setOrientation(mController != null ? mController.orientation : ViewPager2.ORIENTATION_HORIZONTAL);
             viewPager2.registerOnPageChangeCallback(pageChangeCallback2 = new ViewPager2.OnPageChangeCallback() {
                 @Override
@@ -277,6 +289,9 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
             setDragView(viewPager);
             mMPagerAdapter = new DragStatePagerAdapter(getChildFragmentManager(), mController.fragmentClassList, mController.listData);
             viewPager.setAdapter(mMPagerAdapter);
+            if (mController != null) {
+                viewPager.setOffscreenPageLimit(mController.offscreenPageLimit);
+            }
             viewPager.addOnPageChangeListener(this);
             viewPager.setCurrentItem(currentPosition, false);
             if (currentPosition == 0) {
