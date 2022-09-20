@@ -261,7 +261,7 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
             setDragView(viewPager2);
             mMPagerAdapter2 = new DragStatePagerAdapter2(getChildFragmentManager(), mController.fragmentClassList, mController.listData);
             viewPager2.setAdapter(mMPagerAdapter2);
-            if (mController != null) {
+            if (mController != null && mController.offscreenPageLimit > 0) {
                 viewPager2.setOffscreenPageLimit(mController.offscreenPageLimit);
             }
             viewPager2.setOrientation(mController != null ? mController.orientation : ViewPager2.ORIENTATION_HORIZONTAL);
@@ -289,7 +289,7 @@ public class DragViewDialog extends DialogFragment implements DragViewLayout.OnD
             setDragView(viewPager);
             mMPagerAdapter = new DragStatePagerAdapter(getChildFragmentManager(), mController.fragmentClassList, mController.listData);
             viewPager.setAdapter(mMPagerAdapter);
-            if (mController != null) {
+            if (mController != null && mController.offscreenPageLimit > 0) {
                 viewPager.setOffscreenPageLimit(mController.offscreenPageLimit);
             }
             viewPager.addOnPageChangeListener(this);
